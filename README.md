@@ -26,9 +26,9 @@ upload, checked every day).
 - **Bar chip.** Left click opens the popup (mode, sound, volume, quality, the
   stream URL, daily options). Middle click flips animated and still. Scroll
   changes the volume.
-- **Stays out of the way.** Decoding pauses while a fullscreen window covers
-  the wallpaper; the video is capped at 720p by default (480p and 1080p are a
-  click away).
+- **Stays out of the way.** Video decoding pauses while a fullscreen window
+  covers the wallpaper (the music keeps playing); the video is capped at 720p
+  by default (480p and 1080p are a click away).
 - **Update alerts.** The popup tells you when a newer version is published and
   what changed.
 
@@ -59,9 +59,12 @@ omarchy plugin add https://github.com/OmarchyFans/Omarchy-Fans-Daily-Zen-Wallpap
 still. Every step is optional and idempotent; config files are backed up before
 they are appended to; nothing runs with sudo.
 
-If the chip does not appear, add it to the bar with
-`omarchy plugin enable fans.omarchy.daily-zen-wallpaper` (or Setup > Plugins).
-The engine starts with the chip.
+`--enable` puts the chip in the right section of the bar (move it with
+`omarchy bar move`) and starts the engine with it: the default stream begins
+playing with sound at 35 % right away, and within the first minute the daily
+refresh saves a still and makes it the Omarchy background. Switch to *Still*
+or *Off* in the popup if you only wanted the picture. If the chip is missing,
+run `omarchy plugin enable fans.omarchy.daily-zen-wallpaper` or use Setup > Plugins.
 
 ### Dependencies
 
@@ -131,7 +134,9 @@ hand: `omarchy plugin update fans.omarchy.daily-zen-wallpaper`, then
 - The animated wallpaper plays on one monitor (the first, or `screen` in the
   config). Other monitors keep the stock background.
 - Video decoding costs battery. Still mode with sound is the frugal option;
-  fullscreen windows pause decoding automatically.
+  fullscreen windows pause the video automatically.
+- The window shows black for a moment while the first frames buffer after a
+  (re)start of the stream.
 - Applying a theme restarts terminals and retints apps, as any Omarchy theme
   change does. That is why *Make a theme* is a button and *Daily theme* is off
   by default.

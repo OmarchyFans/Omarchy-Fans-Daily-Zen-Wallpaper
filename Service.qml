@@ -48,7 +48,8 @@ Item {
 
   readonly property bool covered: pauseWhenFullscreen && fullscreen
   readonly property bool wantVideo: mode === "animated" && !paused && !covered
-  readonly property bool wantAudio: mode !== "off" && sound && !paused && !covered
+  // Audio keeps playing behind a fullscreen window: the music is the point, only the picture is hidden.
+  readonly property bool wantAudio: mode !== "off" && sound && !paused
   readonly property bool needStream: mode === "animated" || (mode === "still" && sound)
 
   // ---- config -----------------------------------------------------------------
@@ -167,7 +168,7 @@ Item {
     }
     if (mode === "off") state = "off"
     else if (paused) state = "paused"
-    else if (covered) state = "paused-fullscreen"
+    else if (covered && mode === "animated") state = "paused-fullscreen"
     else if (!needStream) state = "idle"
     else state = "playing"
   }

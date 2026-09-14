@@ -139,7 +139,7 @@ Panel {
     var s = root.engineState
     var head = s === "playing" ? (root.mode === "animated" ? "Playing" : (root.sound ? "Playing sound, still wallpaper" : "Still wallpaper"))
       : s === "paused" ? "Paused"
-      : s === "paused-fullscreen" ? "Paused behind a fullscreen window"
+      : s === "paused-fullscreen" ? "Video paused behind a fullscreen window" + (root.sound ? ", sound on" : "")
       : s === "resolving" ? "Finding the stream…"
       : s === "error" ? "Problem: " + (root.engine.error || "unknown") + (root.engine.retries ? " (retrying)" : "")
       : s === "off" ? "Off" : "Idle"
@@ -446,8 +446,8 @@ Panel {
           }
           Toggle {
             width: parent.width
-            label: "Pause behind fullscreen windows"
-            description: "Stop decoding while a fullscreen window covers the wallpaper"
+            label: "Pause video behind fullscreen windows"
+            description: "Stop decoding the picture while a fullscreen window covers it; the sound keeps playing"
             checked: root.cfg.pause_when_fullscreen !== false
             fontFamily: root.fontFamily
             onClicked: root.act(["fullscreen-pause", root.cfg.pause_when_fullscreen !== false ? "off" : "on"])
