@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "omarchy-theme-set $*" >>"${DZ_LOG:-/dev/null}"

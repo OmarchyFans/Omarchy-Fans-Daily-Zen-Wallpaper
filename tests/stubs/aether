@@ -1,0 +1,11 @@
+#!/bin/bash
+# test stub for `aether --generate FRAME --no-apply --output DIR`
+echo "aether $*" >>"${DZ_LOG:-/dev/null}"
+out=""; prev=""
+for a in "$@"; do [[ $prev == --output ]] && out=$a; prev=$a; done
+[[ -n $out ]] || exit 1
+mkdir -p "$out/backgrounds"
+printf 'mode = "dark"\naccent = "#6f8d6c"\nforeground = "#cbba85"\nbackground = "#080f1b"\n' >"$out/colors.toml"
+printf 'shadow\n' >"$out/alacritty.toml"
+printf 'shadow\n' >"$out/hyprland.conf"
+cp "$2" "$out/backgrounds/" 2>/dev/null || true

@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "xdg-open $*" >>"${DZ_LOG:-/dev/null}"

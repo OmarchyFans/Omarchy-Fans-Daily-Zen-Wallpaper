@@ -1,0 +1,384 @@
+#!/bin/bash
+#
+# omarchy-daily-zen — helper for the Daily Zen Wallpaper plugin
+# (fans.omarchy.daily-zen-wallpaper). The engine inside omarchy-shell
+# (Service.qml) and the bar chip (Widget.qml) call this for everything that
+# touches the network or the disk; you can call it too.
+#
+#   omarchy-daily-zen status [--json]          what is playing, the last still, the daily stamp
+#   omarchy-daily-zen set-url URL              use another YouTube video, live stream, playlist or channel
+#   omarchy-daily-zen mode animated|still|off  video under your windows, a still frame, or nothing
+#   omarchy-daily-zen sound on|off             play the stream's audio (also in still mode)
+#   omarchy-daily-zen volume 0..1              audio volume
+#   omarchy-daily-zen quality 480|720|1080     largest video height to decode
+#   omarchy-daily-zen daily-refresh on|off     a fresh still (and the newest video of a channel) every day
+#   omarchy-daily-zen daily-theme on|off       also rebuild the Aether theme every day
+#   omarchy-daily-zen fullscreen-pause on|off  pause while a window is fullscreen
+#   omarchy-daily-zen toggle-mode              animated <-> still (for a keybinding)
+#   omarchy-daily-zen pause | resume           pause or resume the engine
+#   omarchy-daily-zen resolve [--force]        ask yt-dlp for the stream URLs (cached until they expire)
+#   omarchy-daily-zen still [--at SEC] [--no-set]   grab one frame, make it the Omarchy background
+#   omarchy-daily-zen theme [--frame PATH] [--light] [--no-apply]   Aether palette from a frame -> Omarchy theme
+#   omarchy-daily-zen daily [--force]          the daily refresh (still, newest video, theme if enabled)
+#   omarchy-daily-zen open                     open the current video in the browser
+#   omarchy-daily-zen update-check|update-dismiss|update-run   see docs/update-alerts.md
+#
+# Files:
+#   ~/.config/omarchy-daily-zen/config.json          settings (this script writes it; the engine watches it)
+#   ~/.local/state/omarchy-daily-zen/stream.json     the resolved stream (URLs expire after a few hours)
+#   ~/.local/state/omarchy-daily-zen/frame.json      the last still
+#   ~/.local/state/omarchy-daily-zen/daily.json      when the daily refresh last ran
+#   ~/.local/share/omarchy-daily-zen/frames/         still frames (the newest twelve are kept)
+#   ~/.config/omarchy/themes/<theme_name>/           the Aether theme, applied with omarchy-theme-set
+#
+# Network: yt-dlp talks to YouTube to resolve the stream; ffmpeg fetches one
+# frame for a still; the engine streams the video and audio from YouTube.
+# Nothing else leaves the machine (the update check is documented separately).
+#
+# Every tool comes from root-owned system folders, never the caller's PATH.
+set -euo pipefail
+export PATH="/usr/share/omarchy/bin:/usr/local/bin:/usr/bin:/bin"
+ROOT="$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/.." && pwd)"
+# Tests may put the plugin's own stubs first (tests/run.sh sets this to tests/stubs).
+[[ -n ${DZ_TEST_STUBS:-} && $DZ_TEST_STUBS == "$ROOT/tests/stubs" ]] && PATH="$DZ_TEST_STUBS:$PATH"
+
+VERSION=$(jq -r '.version // "dev"' "$ROOT/manifest.json" 2>/dev/null || echo dev)
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy-daily-zen"
+CONFIG="$CONFIG_DIR/config.json"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy-daily-zen"
+STREAM="$STATE_DIR/stream.json"
+FRAME_STATE="$STATE_DIR/frame.json"
+DAILY_STATE="$STATE_DIR/daily.json"
+FRAMES="${XDG_DATA_HOME:-$HOME/.local/share}/omarchy-daily-zen/frames"
+THEMES_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/themes"
+DEFAULT_URL="https://www.youtube.com/watch?v=vFJuk4U-V7Q"
+IPC_TARGET="daily-zen"
+KEEP_FRAMES=12
+
+die() { echo "omarchy-daily-zen: $*" >&2; exit 1; }
+now() { date +%s; }
+
+# ---- config ------------------------------------------------------------------
+defaults() {
+  jq -n --arg url "$DEFAULT_URL" '{
+    url: $url, mode: "animated", sound: true, volume: 0.35, quality: 720,
+    daily_refresh: true, daily_theme: false, theme_name: "daily-zen",
+    pause_when_fullscreen: true, screen: "", update_check: true }'
+}
+config() {
+  jq -s '.[0] * .[1]' <(defaults) <({ [[ -f $CONFIG ]] && jq . "$CONFIG" 2>/dev/null; } || echo '{}')
+}
+cfg() { config | jq -r --arg k "$1" '.[$k]'; }
+config_set() { # config_set KEY JSON_VALUE
+  local tmp
+  mkdir -p "$CONFIG_DIR"
+  tmp=$(mktemp "$CONFIG_DIR/.config.XXXXXX")
+  if config | jq --arg k "$1" --argjson v "$2" '.[$k] = $v' >"$tmp"; then
+    mv -f "$tmp" "$CONFIG"
+  else
+    rm -f "$tmp"; die "could not write $CONFIG"
+  fi
+}
+write_json() { # write_json PATH  (stdin -> file, atomically)
+  local tmp
+  mkdir -p "$(dirname "$1")"
+  tmp=$(mktemp "$(dirname "$1")/.tmp.XXXXXX")
+  cat >"$tmp" && mv -f "$tmp" "$1"
+}
+onoff() { case "${1:-}" in on|true|1|yes) echo true ;; off|false|0|no) echo false ;; *) die "expected on or off, got '${1:-}'" ;; esac; }
+
+# The running engine, if any. Best effort: no shell, no problem.
+ipc() { command -v omarchy-shell >/dev/null 2>&1 || return 0; timeout 3 omarchy-shell -q "$IPC_TARGET" "$@" 2>/dev/null || true; }
+ipc_get() { command -v omarchy-shell >/dev/null 2>&1 || return 0; timeout 3 omarchy-shell "$IPC_TARGET" "$@" 2>/dev/null || true; }
+
+# ---- URLs --------------------------------------------------------------------
+# Only YouTube, only https, only URL characters: the value is passed to yt-dlp
+# after `--` and stored in JSON, never handed to a shell.
+valid_url() {
+  local u=$1
+  LC_ALL=C; [[ $u =~ ^https://(www\.|m\.|music\.)?(youtube\.com|youtu\.be)/[A-Za-z0-9._~:/?#@!\$\&\'\(\)\*\+,\;=%-]*$ ]]
+}
+source_kind() { # video | playlist | channel
+  local u=${1%/}
+  case "$u" in
+    *"/watch?"*|*"youtu.be/"*|*"/live/"*|*"/shorts/"*|*"/embed/"*) echo video ;;
+    *"list="*|*"/playlist"*) echo playlist ;;
+    *"/@"*|*"/channel/"*|*"/c/"*|*"/user/"*) echo channel ;;
+    *) echo video ;;
+  esac
+}
+# The newest entry of a playlist or channel. Channels: the streams tab first
+# (that is where the long mood streams live), then the uploads.
+newest_video_id() { # newest_video_id URL KIND
+  local url=${1%/} kind=$2 id cand
+  local -a cands=()
+  case "$kind" in
+    playlist) cands=("$url") ;;
+    channel)
+      url=${url%/videos}; url=${url%/streams}; url=${url%/live}
+      cands=("$url/streams" "$url/videos") ;;
+  esac
+  for cand in "${cands[@]}"; do
+    id=$(yt-dlp --no-warnings --flat-playlist --playlist-items 1 --print id -- "$cand" 2>/dev/null | head -n1 || true)
+    if [[ $id =~ ^[A-Za-z0-9_-]{6,}$ ]]; then echo "$id"; return 0; fi
+  done
+  return 1
+}
+url_expiry() { # the googlevideo URLs carry their expiry; default five hours
+  local u=$1
+  if [[ $u =~ /expire/([0-9]{9,11})(/|$) ]] || [[ $u =~ [?\&]expire=([0-9]{9,11}) ]]; then echo "${BASH_REMATCH[1]}"; else echo $(( $(now) + 5 * 3600 )); fi
+}
+
+# Pick one video and one audio format for the engine. HLS (m3u8) first: the
+# stream starts fast and seeks by segment. avc1 before vp9: hardware decoders
+# and Qt's ffmpeg backend both like it. Height capped at the configured
+# quality; without a small enough format the smallest one wins.
+FORMAT_JQ='
+  def hls: [.formats[] | select((.protocol // "") | startswith("m3u8"))];
+  def plain: [.formats[] | select(.protocol == "https" or .protocol == "http")];
+  def vids(fs): [fs[] | select(.vcodec != null and .vcodec != "none" and (.height // 0) > 0 and .url != null)];
+  def pickv(fs; q):
+    (vids(fs)) as $v
+    | ( [$v[] | select((.height // 0) <= q and ((.vcodec // "") | startswith("avc1")))] | sort_by(.height, .tbr // 0) | last )
+      // ( [$v[] | select((.height // 0) <= q)] | sort_by(.height, .tbr // 0) | last )
+      // ( $v | sort_by(.height) | first );
+  def picka(fs): ( [fs[] | select((.vcodec == null or .vcodec == "none") and (.acodec == null or .acodec != "none") and .height == null and .url != null)]
+                   | sort_by((if ((.acodec // "") | startswith("mp4a")) then 1 else 0 end), (.tbr // .abr // 0)) | last );
+  (hls) as $h | (plain) as $p
+  | (pickv($h; $q) // pickv($p; $q)) as $v
+  | (if (($v.protocol // "") | startswith("m3u8")) then (picka($h) // picka($p)) else (picka($p) // picka($h)) end) as $a
+  | { source_url: $src, source_kind: $kind, video_id: .id, title: (.title // ""), channel: (.channel // .uploader // ""),
+      webpage_url: (.webpage_url // ""), duration: (.duration // 0), is_live: (.is_live // false), quality: $q,
+      video_url: ($v.url // ""), video_height: ($v.height // 0), video_format: ($v.format_id // ""), video_protocol: ($v.protocol // ""),
+      audio_url: ($a.url // ""), audio_format: ($a.format_id // ""), resolved_at: $now, expires: 0 }
+'
+
+cmd_resolve() {
+  local force=0 json=0 quiet=0 a url kind quality watch id info out
+  for a in "$@"; do case "$a" in --force) force=1 ;; --json) json=1 ;; --quiet) quiet=1 ;; *) die "resolve: unknown option $a" ;; esac; done
+  url=$(cfg url); quality=$(cfg quality)
+  valid_url "$url" || die "not a YouTube URL: $url"
+  [[ $quality =~ ^[0-9]+$ ]] || quality=720
+  mkdir -p "$STATE_DIR"
+  # One resolve at a time (the engine and a still can ask together). The lock
+  # is released before returning: still and daily call resolve from subshells.
+  exec 9>"$STATE_DIR/.lock"; flock 9
+  if (( ! force )) && [[ -f $STREAM ]] \
+     && jq -e --arg u "$url" --argjson q "$quality" --argjson now "$(now)" \
+          '.source_url == $u and .quality == $q and .video_url != "" and (.expires - 900) > $now' "$STREAM" >/dev/null 2>&1; then
+    exec 9>&-
+    (( json )) && cat "$STREAM"
+    (( quiet || json )) || jq -r '"\(.title) — \(.channel) (\(.video_height)p, cached)"' "$STREAM"
+    return 0
+  fi
+  kind=$(source_kind "$url")
+  if [[ $kind == video ]]; then
+    watch=$url
+  else
+    id=$(newest_video_id "$url" "$kind") || die "no video found at $url"
+    watch="https://www.youtube.com/watch?v=$id"
+  fi
+  info=$(yt-dlp --no-warnings --no-playlist -j -- "$watch" 2>&1) || die "yt-dlp: ${info##*$'\n'}"
+  out=$(jq -c --arg src "$url" --arg kind "$kind" --argjson q "$quality" --argjson now "$(now)" "$FORMAT_JQ" <<<"$info") || die "could not read the yt-dlp answer"
+  [[ $(jq -r .video_url <<<"$out") != "" ]] || die "no playable video format at $watch"
+  out=$(jq -c --argjson exp "$(url_expiry "$(jq -r .video_url <<<"$out")")" '.expires = $exp' <<<"$out")
+  write_json "$STREAM" <<<"$out"
+  exec 9>&-
+  (( json )) && cat "$STREAM"
+  (( quiet || json )) || jq -r '"\(.title) — \(.channel) (\(.video_height)p\(if .is_live then ", live" else "" end))"' "$STREAM"
+}
+
+# ---- still -------------------------------------------------------------------
+prune_frames() {
+  local f n=0
+  while IFS= read -r f; do
+    n=$((n + 1))
+    if (( n > KEEP_FRAMES )); then rm -f -- "$f"; fi
+  done < <(ls -1t -- "$FRAMES"/*.png 2>/dev/null || true)
+  return 0
+}
+cmd_still() {
+  local at="" set=1 json=0 quiet=0 a video_url duration is_live id out
+  while (( $# )); do
+    case "$1" in
+      --at) at=${2:-}; shift ;;
+      --random) at="" ;;
+      --no-set) set=0 ;;
+      --json) json=1 ;;
+      --quiet) quiet=1 ;;
+      *) die "still: unknown option $1" ;;
+    esac; shift
+  done
+  cmd_resolve --quiet
+  video_url=$(jq -r .video_url "$STREAM"); duration=$(jq -r '.duration // 0' "$STREAM")
+  is_live=$(jq -r '.is_live' "$STREAM"); id=$(jq -r .video_id "$STREAM")
+  [[ $id =~ ^[A-Za-z0-9_-]+$ ]] || id=video
+  duration=${duration%.*}; [[ $duration =~ ^[0-9]+$ ]] || duration=0
+  if [[ $is_live == true ]]; then
+    at=""
+  elif [[ -z $at ]] && (( duration > 30 )); then
+    # anywhere in the middle 96 %: not the intro card, not the outro
+    at=$(( duration * 2 / 100 + RANDOM * (duration * 96 / 100) / 32768 ))
+  fi
+  [[ -z $at || $at =~ ^[0-9]+$ ]] || die "still: --at wants seconds"
+  mkdir -p "$FRAMES"
+  out="$FRAMES/${id}-$(date +%Y%m%d-%H%M%S)${at:+-at$at}.png"
+  local -a seek=(); [[ -n $at ]] && seek=(-ss "$at")
+  # -- is not an ffmpeg thing; the URL starts with https:// and the output with /.
+  ffmpeg -v error -y -nostdin "${seek[@]}" -i "$video_url" -frames:v 1 -q:v 2 "$out" </dev/null \
+    || die "ffmpeg could not grab a frame (the stream URL may have expired: try 'omarchy-daily-zen resolve --force')"
+  [[ -s $out ]] || die "ffmpeg wrote no frame"
+  prune_frames
+  jq -n --arg path "$out" --arg id "$id" --arg at "${at:-}" --argjson taken "$(now)" \
+    '{path: $path, video_id: $id, at: (if $at == "" then null else ($at | tonumber) end), taken: $taken}' | write_json "$FRAME_STATE"
+  if (( set )); then
+    omarchy-theme-bg-set "$out" >/dev/null 2>&1 || echo "omarchy-daily-zen: omarchy-theme-bg-set failed; the frame is at $out" >&2
+  fi
+  if (( json )); then cat "$FRAME_STATE"; elif (( ! quiet )); then echo "$out"; fi
+}
+
+# ---- theme -------------------------------------------------------------------
+cmd_theme() {
+  local frame="" apply=1 light=0 json=0 name tmp dest
+  while (( $# )); do
+    case "$1" in
+      --frame) frame=${2:-}; shift ;;
+      --no-apply) apply=0 ;;
+      --light) light=1 ;;
+      --json) json=1 ;;
+      *) die "theme: unknown option $1" ;;
+    esac; shift
+  done
+  command -v aether >/dev/null 2>&1 || die "aether is not installed (it ships with Omarchy: sudo pacman -S aether)"
+  if [[ -z $frame ]]; then
+    frame=$(jq -r '.path // ""' "$FRAME_STATE" 2>/dev/null || true)
+    [[ -n $frame && -f $frame ]] || frame=$(cmd_still --no-set)
+  fi
+  [[ -f $frame ]] || die "no such frame: $frame"
+  name=$(cfg theme_name)
+  (LC_ALL=C; [[ $name =~ ^[a-z0-9_][a-z0-9._+-]*$ ]]) || die "theme_name '$name' is not a usable theme name"
+  tmp=$(mktemp -d)
+  local -a opts=(); (( light )) && opts=(--light-mode)
+  if ! aether --generate "$frame" --no-apply --output "$tmp" "${opts[@]}" >/dev/null 2>"$tmp/.err"; then
+    local err; err=$(tail -n1 "$tmp/.err" 2>/dev/null || true); rm -rf "$tmp"; die "aether failed: ${err:-no message}"
+  fi
+  [[ -f $tmp/colors.toml ]] || { rm -rf "$tmp"; die "aether wrote no colors.toml"; }
+  # Only the palette and the picture. Everything else Aether renders (terminal
+  # configs, hyprland.conf, ...) would shadow the files omarchy-theme-set
+  # generates from colors.toml for Omarchy 4.
+  dest="$THEMES_DIR/$name"
+  mkdir -p "$dest/backgrounds"
+  rm -f -- "$dest"/backgrounds/*
+  cp -- "$tmp/colors.toml" "$dest/colors.toml"
+  cp -- "$frame" "$dest/backgrounds/$(basename -- "$frame")"
+  cp -- "$frame" "$dest/preview.png"
+  printf '# %s\n\nMade by Daily Zen Wallpaper (fans.omarchy.daily-zen-wallpaper): Aether extracted this palette from\n%s\n\nRegenerate with: omarchy-daily-zen theme\n' "$name" "$frame" >"$dest/README.md"
+  rm -rf "$tmp"
+  if (( apply )); then
+    omarchy-theme-set "$name" >/dev/null 2>&1 || echo "omarchy-daily-zen: omarchy-theme-set $name failed; the theme is at $dest" >&2
+  fi
+  if (( json )); then
+    jq -n --arg name "$name" --arg dir "$dest" --arg frame "$frame" --argjson applied "$([[ $apply == 1 ]] && echo true || echo false)" \
+      '{theme: $name, dir: $dir, frame: $frame, applied: $applied}'
+  else
+    echo "$dest"
+  fi
+}
+
+# ---- daily -------------------------------------------------------------------
+cmd_daily() {
+  local force=0 a last frame before after
+  for a in "$@"; do case "$a" in --force) force=1 ;; *) die "daily: unknown option $a" ;; esac; done
+  if (( ! force )) && [[ $(cfg daily_refresh) != true ]]; then echo "daily refresh is off"; return 0; fi
+  last=$(jq -r '.last // 0' "$DAILY_STATE" 2>/dev/null || echo 0); [[ $last =~ ^[0-9]+$ ]] || last=0
+  if (( ! force )) && (( $(now) - last < 86400 )); then echo "already refreshed today"; return 0; fi
+  before=$(jq -r '.video_id // ""' "$STREAM" 2>/dev/null || true)
+  cmd_resolve --force --quiet
+  after=$(jq -r '.video_id // ""' "$STREAM")
+  frame=$(cmd_still --quiet; jq -r .path "$FRAME_STATE")
+  if [[ $(cfg daily_theme) == true ]]; then cmd_theme --frame "$frame" >/dev/null; fi
+  jq -n --argjson last "$(now)" --arg frame "$frame" --arg id "$after" '{last: $last, frame: $frame, video_id: $id}' | write_json "$DAILY_STATE"
+  # A new video (channels, playlists) starts playing; the same video keeps playing.
+  ipc refresh
+  echo "$frame"
+}
+
+# ---- status ------------------------------------------------------------------
+cmd_status() {
+  local json=0 a engine
+  for a in "$@"; do case "$a" in --json) json=1 ;; *) die "status: unknown option $a" ;; esac; done
+  engine=$(ipc_get status); [[ -n $engine ]] && jq -e . <<<"$engine" >/dev/null 2>&1 || engine=null
+  local out
+  out=$(jq -n --arg version "$VERSION" --argjson config "$(config)" \
+    --argjson stream "$( [[ -f $STREAM ]] && jq '{title, channel, video_id, is_live, video_height, video_format, audio_format, expires, resolved_at, webpage_url, source_kind, duration}' "$STREAM" || echo null)" \
+    --argjson frame "$( [[ -f $FRAME_STATE ]] && cat "$FRAME_STATE" || echo null)" \
+    --argjson daily "$( [[ -f $DAILY_STATE ]] && cat "$DAILY_STATE" || echo null)" \
+    --argjson engine "$engine" --argjson now "$(now)" \
+    '{version: $version, config: $config, stream: $stream, frame: $frame, daily: $daily, engine: $engine, now: $now}')
+  if (( json )); then echo "$out"; return 0; fi
+  jq -r '
+    "Daily Zen Wallpaper \(.version)",
+    "  stream:  \(.config.url)",
+    "  playing: \(if .stream then "\(.stream.title) — \(.stream.channel) (\(.stream.video_height)p\(if .stream.is_live then ", live" else "" end))" else "not resolved yet" end)",
+    "  engine:  \(if .engine then "\(.engine.state)\(if .engine.error != "" then " — " + .engine.error else "" end)" else "not running (is the plugin enabled?)" end)",
+    "  mode:    \(.config.mode), sound \(if .config.sound then "on" else "off" end) at \(.config.volume), up to \(.config.quality)p",
+    "  daily:   refresh \(if .config.daily_refresh then "on" else "off" end), theme \(if .config.daily_theme then "on" else "off" end)\(if .daily then ", last " + ((.now - .daily.last) / 3600 | floor | tostring) + " h ago" else "" end)",
+    "  still:   \(if .frame then .frame.path else "none yet" end)"
+  ' <<<"$out"
+}
+
+cmd_set_url() {
+  local url=${1:-}
+  [[ -n $url ]] || die "set-url wants a URL"
+  valid_url "$url" || die "only https YouTube links (youtube.com, youtu.be, music.youtube.com) are accepted"
+  config_set url "$(jq -n --arg u "$url" '$u')"
+  rm -f "$STREAM"
+  ipc reload
+  cmd_resolve --quiet && cmd_resolve
+}
+
+cmd_open() {
+  local u; u=$(jq -r '.webpage_url // ""' "$STREAM" 2>/dev/null || true); [[ -n $u ]] || u=$(cfg url)
+  valid_url "$u" || die "nothing to open"
+  setsid -f xdg-open "$u" >/dev/null 2>&1 </dev/null
+}
+
+usage() { sed -n '3,25p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; }
+
+main() {
+  local cmd=${1:-help}; shift || true
+  case "$cmd" in
+    status) cmd_status "$@" ;;
+    set-url) cmd_set_url "$@" ;;
+    mode)
+      case "${1:-}" in animated|still|off) ;; *) die "mode wants animated, still or off" ;; esac
+      config_set mode "$(jq -n --arg m "$1" '$m')"; ipc reload ;;
+    sound) config_set sound "$(onoff "${1:-}")"; ipc reload ;;
+    volume)
+      [[ ${1:-} =~ ^(0|1|0?\.[0-9]+|1\.0+)$ ]] || die "volume wants a number from 0 to 1"
+      config_set volume "$1"; ipc reload ;;
+    quality)
+      case "${1:-}" in 480|720|1080) ;; *) die "quality wants 480, 720 or 1080" ;; esac
+      config_set quality "$1"; rm -f "$STREAM"; ipc reload ;;
+    daily-refresh) config_set daily_refresh "$(onoff "${1:-}")" ;;
+    daily-theme) config_set daily_theme "$(onoff "${1:-}")" ;;
+    fullscreen-pause) config_set pause_when_fullscreen "$(onoff "${1:-}")"; ipc reload ;;
+    toggle-mode)
+      if [[ $(cfg mode) == animated ]]; then config_set mode '"still"'; else config_set mode '"animated"'; fi
+      ipc reload; cfg mode ;;
+    pause) ipc pause ;;
+    resume) ipc resume ;;
+    resolve) cmd_resolve "$@" ;;
+    still) cmd_still "$@" ;;
+    theme) cmd_theme "$@" ;;
+    daily) cmd_daily "$@" ;;
+    open) cmd_open ;;
+    update-check) exec bash "$ROOT/lib/update.sh" check "$@" ;;
+    update-dismiss) exec bash "$ROOT/lib/update.sh" dismiss "$@" ;;
+    update-run) exec bash "$ROOT/lib/update.sh" run "$@" ;;
+    version|--version) echo "$VERSION" ;;
+    help|-h|--help) usage ;;
+    *) echo "omarchy-daily-zen: unknown command '$cmd'" >&2; usage >&2; exit 2 ;;
+  esac
+}
+main "$@"

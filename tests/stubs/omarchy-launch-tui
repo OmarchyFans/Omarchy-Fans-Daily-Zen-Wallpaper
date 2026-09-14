@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "omarchy-launch-tui $*" >>"${DZ_LOG:-/dev/null}"

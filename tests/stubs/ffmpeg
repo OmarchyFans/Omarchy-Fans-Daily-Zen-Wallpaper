@@ -1,0 +1,6 @@
+#!/bin/bash
+# test stub: writes a tiny PNG to the last argument; records argv
+echo "ffmpeg $*" >>"${DZ_LOG:-/dev/null}"
+[[ -n ${DZ_FFMPEG_FAIL:-} ]] && exit 1
+out=${*: -1}
+printf '\x89PNG\r\n\x1a\n' >"$out"

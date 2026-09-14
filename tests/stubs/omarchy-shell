@@ -1,0 +1,4 @@
+#!/bin/bash
+echo "omarchy-shell $*" >>"${DZ_LOG:-/dev/null}"
+[[ $1 == -q ]] && shift
+if [[ $2 == status ]]; then echo '{"state":"playing","error":"","retries":0}'; fi

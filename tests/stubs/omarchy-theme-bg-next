@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "omarchy-theme-bg-next $*" >>"${DZ_LOG:-/dev/null}"

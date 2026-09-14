@@ -1,0 +1,16 @@
+#!/bin/bash
+# test stub: answers from $DZ_FIXTURE (a yt-dlp -j document); records argv in $DZ_LOG
+echo "yt-dlp $*" >>"${DZ_LOG:-/dev/null}"
+args=("$@")
+if [[ " $* " == *" --flat-playlist "* ]]; then
+  url=${args[-1]}
+  case "$url" in
+    *"/streams") [[ -n ${DZ_STREAMS_EMPTY:-} ]] && exit 1; echo "STREAM01xyz" ;;
+    *"/videos") echo "VIDEO01abcd" ;;
+    *"list="*) echo "PLAY01abcde" ;;
+    *) exit 1 ;;
+  esac
+  exit 0
+fi
+[[ -n ${DZ_FAIL:-} ]] && { echo "ERROR: [youtube] boom" >&2; exit 1; }
+cat "${DZ_FIXTURE:?}"

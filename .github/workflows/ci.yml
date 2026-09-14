@@ -1,0 +1,21 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq jq shellcheck
+      - name: syntax
+        run: |
+          bash -n bin/omarchy-daily-zen lib/update.sh install.sh uninstall.sh tests/run.sh
+          shellcheck -S warning bin/omarchy-daily-zen lib/update.sh install.sh uninstall.sh
+      - name: manifest
+        run: |
+          jq -e '.schemaVersion == 1 and (.id | startswith("omarchy.") | not) and (.kinds | index("service")) and (.kinds | index("bar-widget"))' manifest.json
+          test -f "$(jq -r .entryPoints.service manifest.json)" && test -f "$(jq -r .entryPoints.barWidget manifest.json)"
+          test -z "$(find . -path ./.git -prune -o -type l -print)"
+          grep -q "^## $(jq -r .version manifest.json)\$" CHANGELOG.md
+      - name: tests
+        run: tests/run.sh

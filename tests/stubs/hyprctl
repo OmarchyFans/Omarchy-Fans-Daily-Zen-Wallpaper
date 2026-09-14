@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "hyprctl $*" >>"${DZ_LOG:-/dev/null}"
