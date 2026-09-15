@@ -632,7 +632,7 @@ cmd_play() {
 }
 
 cmd_library() {
-  local json=0 refresh=0 category="" channel="" bookmarks=0 a f now community mine bm cats chans entries kind
+  local json=0 refresh=0 category="" channel="" bookmarks=0 a f now community mine bm chans entries kind
   while (( $# )); do
     case "$1" in
       --json) json=1 ;; --refresh) refresh=1 ;; --bookmarks) bookmarks=1 ;;
