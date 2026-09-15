@@ -3,6 +3,13 @@
 The bar popup reads the newest sections of this file to tell you what changed
 when an update is available. Keep one short line per bullet.
 
+## 0.1.1
+
+- The animated wallpaper plays on every monitor (set `screen` in the config to keep it to one)
+- No black screen while the stream buffers: the window appears with the first decoded frame
+- The music keeps playing behind fullscreen windows; only the video pauses
+- The quality dropdown follows changes made from the command line
+
 ## 0.1.0
 
 - Animated wallpaper from a YouTube mood stream, with sound, on the layer under your windows

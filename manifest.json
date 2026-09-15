@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "fans.omarchy.daily-zen-wallpaper",
   "name": "Daily Zen Wallpaper",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "modpunk (omarchy.fans)",
   "license": "MIT",
   "description": "Turn a long-form YouTube mood stream (lofi, zen, ambient) into your Omarchy wallpaper: animated with sound, or a fresh still every day. One click asks Aether to build an Omarchy theme from the current scene.",

@@ -36,10 +36,11 @@ upload, checked every day).
 
 Enable the plugin and the engine (a `service` plugin inside `omarchy-shell`)
 reads `~/.config/omarchy-daily-zen/config.json`, asks `omarchy-daily-zen resolve`
-for the stream, and plays it in a layer-shell window on the *bottom* layer.
-Two Qt Multimedia players run: one for the 720p HLS video rendition (no audio
-output), one for the audio rendition, so "still + sound" and "animated, muted"
-are just which one runs. YouTube URLs expire after a few hours and a 6-hour
+for the stream, and plays it in a layer-shell window per monitor on the
+*bottom* layer, shown only once the first frame is decoded. Each window's Qt
+Multimedia player decodes the 720p HLS video rendition (no audio output), and
+one more player plays the audio rendition, so "still + sound" and "animated,
+muted" are just which players run. YouTube URLs expire after a few hours and a 6-hour
 video ends: the engine re-resolves and carries on. Once an hour it runs
 `omarchy-daily-zen daily`, which does nothing until a day has passed.
 
@@ -101,8 +102,8 @@ omarchy-daily-zen open                     the current video in the browser
 ```
 
 Settings live in `~/.config/omarchy-daily-zen/config.json` (the helper writes
-it, the engine watches it); `screen` names the monitor to draw on (empty =
-the first one; the video plays on one monitor). Still frames are kept in
+it, the engine watches it); `screen` names one monitor to draw on (empty =
+every monitor; each one decodes the video itself). Still frames are kept in
 `~/.local/share/omarchy-daily-zen/frames/` (the newest twelve). The Aether
 theme is `~/.config/omarchy/themes/daily-zen/` (`theme_name` in the config):
 only `colors.toml` and the frame are copied there, so Omarchy 4 renders every
@@ -131,12 +132,13 @@ hand: `omarchy plugin update fans.omarchy.daily-zen-wallpaper`, then
 
 ## Good to know
 
-- The animated wallpaper plays on one monitor (the first, or `screen` in the
-  config). Other monitors keep the stock background.
+- Every monitor plays the video and decodes it separately; on a laptop with
+  an external display, set `"screen": "eDP-1"` (or the other name from
+  `hyprctl monitors`) in the config to keep it to one.
 - Video decoding costs battery. Still mode with sound is the frugal option;
   fullscreen windows pause the video automatically.
-- The window shows black for a moment while the first frames buffer after a
-  (re)start of the stream.
+- While the stream (re)starts and buffers, the stock Omarchy background shows
+  for a moment; the video fades in with its first decoded frame.
 - Applying a theme restarts terminals and retints apps, as any Omarchy theme
   change does. That is why *Make a theme* is a button and *Daily theme* is off
   by default.

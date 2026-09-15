@@ -8,11 +8,14 @@ import QtMultimedia
 // Daily Zen Wallpaper engine (kind: service). Lives inside omarchy-shell for as
 // long as the plugin is enabled.
 //
-// It draws the stream on a layer-shell window on the Bottom layer: above the
-// stock Omarchy background, under every window. Video and audio are two Qt
-// MediaPlayers on two YouTube HLS renditions (bin/omarchy-daily-zen resolve
-// picks them); the video player has no audio output, the audio player has no
-// video, so "still + sound" and "animated, muted" are just which one runs.
+// One layer-shell window per monitor on the Bottom layer: above the stock
+// Omarchy background, under every window. Each window decodes the video
+// itself (Qt's MediaPlayer feeds one VideoOutput), so the config's `screen`
+// can restrict playback to one monitor to save battery. A window only shows
+// once its first frame is decoded, so a (re)start of the stream reveals the
+// stock wallpaper, never a black screen. Audio is one extra MediaPlayer on
+// YouTube's audio rendition, so "still + sound" and "animated, muted" are
+// just which players run.
 //
 // The helper writes ~/.config/omarchy-daily-zen/config.json; this file watches
 // it and reacts. YouTube URLs expire after a few hours and a 6-hour video
@@ -78,7 +81,7 @@ Item {
     var url = String(c.url || "")
     var quality = Number(c.quality || 720)
     var stale = stream && ((url && stream.source_url !== url) || (stream.quality !== quality))
-    if (stale) { stream = null; stopAll() }
+    if (stale) { stream = null; audio.stop(); audio.source = "" }
     if (needStream && !stream) resolve(false, "start")
     syncSoon.restart()
   }
@@ -102,14 +105,16 @@ Item {
       root.error = ""
       // The daily refresh re-resolved the same video: keep playing, the URLs in
       // use are still good and the next expiry swap picks up the new ones.
-      if (root.resolveReason === "refresh" && root.stream && root.stream.video_id === s.video_id
-          && (video.playbackState === MediaPlayer.PlayingState || audio.playbackState === MediaPlayer.PlayingState)) {
+      if (root.resolveReason === "refresh" && root.stream && root.stream.video_id === s.video_id && root.anyPlaying()) {
         root.stream = Object.assign({}, s, { video_url: root.stream.video_url, audio_url: root.stream.audio_url, expires: root.stream.expires })
         syncSoon.restart()
         return
       }
+      // A new source: the windows reload from the binding on stream.video_url,
+      // the audio player from syncPlayers. Pending seeks apply on load.
       root.stream = s
-      root.startPlayback()
+      resumeClear.restart()
+      syncSoon.restart()
     }
   }
   function resolve(force, reason) {
@@ -129,16 +134,27 @@ Item {
     retryTimer.restart()
   }
   Timer { id: retryTimer; repeat: false; onTriggered: if (root.needStream) root.resolve(true, "retry") }
+  // A pending resume position is for the load right after a swap, not for a
+  // later mode change.
+  Timer { id: resumeClear; interval: 45000; repeat: false; onTriggered: root.resumeAt = 0 }
 
   // ---- playback ---------------------------------------------------------------
-  function stopAll() {
-    video.stop(); video.source = ""
-    audio.stop(); audio.source = ""
+  function videoPlayers() {
+    var out = []
+    var inst = screens.instances
+    for (var i = 0; i < inst.length; i++) if (inst[i] && inst[i].player) out.push(inst[i].player)
+    return out
   }
-  function startPlayback() {
-    if (!stream) return
-    stopAll()
-    syncPlayers()
+  function leadVideo() {
+    var inst = screens.instances
+    for (var i = 0; i < inst.length; i++) if (inst[i] && inst[i].wanted) return inst[i].player
+    return null
+  }
+  function anyPlaying() {
+    if (audio.playbackState === MediaPlayer.PlayingState) return true
+    var ps = videoPlayers()
+    for (var i = 0; i < ps.length; i++) if (ps[i].playbackState === MediaPlayer.PlayingState) return true
+    return false
   }
   Timer { id: syncSoon; interval: 60; repeat: false; onTriggered: root.syncPlayers() }
   onWantVideoChanged: syncSoon.restart()
@@ -147,16 +163,16 @@ Item {
 
   function syncPlayers() {
     if (!stream) {
-      if (!needStream) { stopAll(); state = mode === "off" ? "off" : "idle" }
+      if (!needStream) { audio.stop(); audio.source = ""; state = mode === "off" ? "off" : "idle" }
       return
     }
-    // video: only in animated mode; paused (not stopped) while covered or paused
-    if (mode === "animated") {
-      if (String(video.source) !== stream.video_url) video.source = stream.video_url
-      if (wantVideo) { if (video.playbackState !== MediaPlayer.PlayingState) video.play() }
-      else if (video.playbackState === MediaPlayer.PlayingState) video.pause()
-    } else if (String(video.source) !== "") {
-      video.stop(); video.source = ""
+    // video: every window decides its source from the binding; here play/pause
+    var ps = videoPlayers()
+    for (var i = 0; i < ps.length; i++) {
+      var p = ps[i]
+      if (String(p.source) === "") continue
+      if (wantVideo) { if (p.playbackState !== MediaPlayer.PlayingState && p.mediaStatus >= MediaPlayer.LoadedMedia) p.play() }
+      else if (p.playbackState === MediaPlayer.PlayingState) p.pause()
     }
     // audio: whenever sound is on and the mode is not off
     if (mode !== "off" && sound && stream.audio_url) {
@@ -174,8 +190,8 @@ Item {
   }
 
   function seekIfPending(player) {
-    if (resumeAt <= 0 || (stream && stream.is_live)) { resumeAt = 0; return }
-    if (player.seekable) { player.position = resumeAt }
+    if (resumeAt <= 0 || (stream && stream.is_live)) return
+    if (player.seekable) player.position = resumeAt
   }
   function endOfMedia() {
     // Loop the stream. Re-resolve: after six hours the URLs are past their expiry.
@@ -189,27 +205,21 @@ Item {
     resumeAt = savedPosition
     fail(which + ": " + message)
   }
-
-  MediaPlayer {
-    id: video
-    videoOutput: videoOut
-    onMediaStatusChanged: {
-      if (mediaStatus === MediaPlayer.EndOfMedia) root.endOfMedia()
-      else if (mediaStatus === MediaPlayer.LoadedMedia || mediaStatus === MediaPlayer.BufferedMedia) {
-        root.seekIfPending(video)
-        if (root.resumeAt > 0 && audio.mediaStatus >= MediaPlayer.LoadedMedia) root.seekIfPending(audio)
-      }
-    }
-    onErrorOccurred: function(err, message) { root.playerError("video", message) }
+  function onVideoLoaded(player) {
+    seekIfPending(player)
+    if (wantVideo) player.play()
+    if (audio.mediaStatus >= MediaPlayer.LoadedMedia && audio.playbackState === MediaPlayer.PlayingState && player.position > 2000 && audio.seekable) audio.position = player.position
   }
+
   MediaPlayer {
     id: audio
     audioOutput: AudioOutput { volume: root.volume }
     onMediaStatusChanged: {
       if (mediaStatus === MediaPlayer.EndOfMedia && root.mode !== "animated") root.endOfMedia()
       else if (mediaStatus === MediaPlayer.LoadedMedia || mediaStatus === MediaPlayer.BufferedMedia) {
-        if (root.mode !== "animated") root.seekIfPending(audio)
-        else if (video.position > 2000) audio.position = video.position
+        var lead = root.leadVideo()
+        if (root.mode !== "animated" || !lead) root.seekIfPending(audio)
+        else if (lead.position > 2000 && audio.seekable) audio.position = lead.position
       }
     }
     onErrorOccurred: function(err, message) { root.playerError("audio", message) }
@@ -220,24 +230,30 @@ Item {
     interval: 60000; repeat: true
     running: root.stream !== null && root.needStream
     onTriggered: {
-      var lead = root.mode === "animated" ? video : audio
-      if (lead.position > 0) root.savedPosition = lead.position
+      var lead = root.mode === "animated" ? root.leadVideo() : audio
+      if (lead && lead.position > 0) root.savedPosition = lead.position
       var nowSec = Date.now() / 1000
       if (root.stream.expires && nowSec > root.stream.expires - 240 && !resolveProc.running) {
         root.resumeAt = root.savedPosition
         root.resolve(true, "expiry")
         return
       }
-      if (root.wantVideo && root.wantAudio && !root.stream.is_live
-          && video.playbackState === MediaPlayer.PlayingState && audio.playbackState === MediaPlayer.PlayingState
-          && Math.abs(audio.position - video.position) > 2500 && audio.seekable) {
-        audio.position = video.position
+      if (root.wantVideo && root.wantAudio && !root.stream.is_live && lead && lead !== audio
+          && lead.playbackState === MediaPlayer.PlayingState && audio.playbackState === MediaPlayer.PlayingState
+          && Math.abs(audio.position - lead.position) > 2500 && audio.seekable) {
+        audio.position = lead.position
+      }
+      // Other monitors follow the lead window.
+      var ps = root.videoPlayers()
+      for (var i = 0; i < ps.length; i++) {
+        var p = ps[i]
+        if (p !== lead && lead && lead !== audio && p.playbackState === MediaPlayer.PlayingState && Math.abs(p.position - lead.position) > 2500 && p.seekable) p.position = lead.position
       }
     }
   }
   Timer { interval: 10000; repeat: true; running: root.state === "playing"; onTriggered: {
-    var lead = root.mode === "animated" ? video : audio
-    if (lead.position > 0) root.savedPosition = lead.position
+    var lead = root.mode === "animated" ? root.leadVideo() : audio
+    if (lead && lead.position > 0) root.savedPosition = lead.position
   } }
 
   // ---- fullscreen -------------------------------------------------------------
@@ -255,14 +271,14 @@ Item {
     command: ["/usr/bin/hyprctl", "activewindow", "-j"]
     environment: root.cliEnv
     stdout: StdioCollector { id: fsOut; waitForEnd: true }
-    function check() { if (!running && root.pauseWhenFullscreen && root.mode !== "off") running = true }
+    function check() { if (!running && root.pauseWhenFullscreen && root.mode === "animated") running = true }
     onExited: function(code) {
       var fs = false
       try { var w = JSON.parse(fsOut.text); fs = !!w && Number(w.fullscreen || 0) > 0 } catch (e) { fs = false }
       root.fullscreen = fs
     }
   }
-  Timer { interval: 4000; repeat: true; running: root.pauseWhenFullscreen && root.mode !== "off"; triggeredOnStart: true; onTriggered: fullscreenProc.check() }
+  Timer { interval: 4000; repeat: true; running: root.pauseWhenFullscreen && root.mode === "animated"; triggeredOnStart: true; onTriggered: fullscreenProc.check() }
   onPauseWhenFullscreenChanged: if (!pauseWhenFullscreen) fullscreen = false
 
   // ---- daily ------------------------------------------------------------------
@@ -289,56 +305,73 @@ Item {
     function pause(): void { root.paused = true; syncSoon.restart() }
     function resume(): void { root.paused = false; syncSoon.restart() }
     function status(): string {
+      var lead = root.leadVideo()
+      var shown = 0
+      var inst = screens.instances
+      for (var i = 0; i < inst.length; i++) if (inst[i] && inst[i].visible) shown += 1
       return JSON.stringify({
         state: root.state, error: root.error, mode: root.mode, sound: root.sound, volume: root.volume,
         paused: root.paused, fullscreen: root.fullscreen, covered: root.covered,
-        video: video.playbackState === MediaPlayer.PlayingState, audio: audio.playbackState === MediaPlayer.PlayingState,
-        position: Math.round((root.mode === "animated" ? video.position : audio.position) / 1000),
+        video: !!lead && lead.playbackState === MediaPlayer.PlayingState, audio: audio.playbackState === MediaPlayer.PlayingState,
+        position: Math.round(((root.mode === "animated" && lead) ? lead.position : audio.position) / 1000),
         title: root.stream ? root.stream.title : "", channel: root.stream ? root.stream.channel : "",
         height: root.stream ? root.stream.video_height : 0, live: root.stream ? !!root.stream.is_live : false,
-        expires: root.stream ? root.stream.expires : 0, retries: root.retries, window: win.visible
+        expires: root.stream ? root.stream.expires : 0, retries: root.retries, windows: shown, screens: inst.length
       })
     }
   }
 
-  // ---- the window -------------------------------------------------------------
-  function pickScreen() {
-    var screens = Quickshell.screens
-    if (!screens || screens.length === 0) return null
-    if (root.screenName) {
-      for (var i = 0; i < screens.length; i++) if (screens[i].name === root.screenName) return screens[i]
-    }
-    return screens[0]
-  }
+  // ---- the windows, one per monitor ---------------------------------------------
+  Variants {
+    id: screens
+    model: Quickshell.screens
 
-  PanelWindow {
-    id: win
-    screen: root.pickScreen()
-    visible: root.mode === "animated" && root.stream !== null
-    anchors { top: true; bottom: true; left: true; right: true }
-    color: "black"
-    WlrLayershell.namespace: "omarchy-fans-daily-zen"
-    WlrLayershell.layer: WlrLayer.Bottom
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-    exclusionMode: ExclusionMode.Ignore
+    PanelWindow {
+      id: win
+      required property var modelData
+      readonly property alias player: player
+      readonly property bool wanted: root.mode === "animated" && root.stream !== null
+                                     && (root.screenName === "" || (modelData && modelData.name === root.screenName))
 
-    VideoOutput {
-      id: videoOut
-      anchors.fill: parent
-      fillMode: VideoOutput.PreserveAspectCrop
-    }
+      screen: modelData
+      // Shown only with a decoded frame: a (re)start reveals the stock wallpaper, not black.
+      visible: wanted && player.hasVideo
+      anchors { top: true; bottom: true; left: true; right: true }
+      color: "black"
+      WlrLayershell.namespace: "omarchy-fans-daily-zen"
+      WlrLayershell.layer: WlrLayer.Bottom
+      WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+      exclusionMode: ExclusionMode.Ignore
 
-    // Same gestures as the stock background underneath: double-click for the
-    // background picker, right double-click for the theme switcher.
-    MouseArea {
-      anchors.fill: parent
-      acceptedButtons: Qt.LeftButton | Qt.RightButton
-      onDoubleClicked: function(mouse) {
-        if (mouse.button === Qt.RightButton)
-          Quickshell.execDetached(["/usr/bin/bash", "-c", "theme=$(omarchy-theme-switcher); [[ -n $theme ]] && omarchy-theme-set \"$theme\" >/dev/null 2>&1 &"])
-        else
-          Quickshell.execDetached(["/usr/bin/bash", "-c", "background=$(omarchy-theme-bg-switcher); [[ -n $background ]] && omarchy-theme-bg-set \"$background\""])
-        mouse.accepted = true
+      MediaPlayer {
+        id: player
+        videoOutput: videoOut
+        source: win.wanted ? root.stream.video_url : ""
+        onMediaStatusChanged: {
+          if (mediaStatus === MediaPlayer.EndOfMedia) { if (player === root.leadVideo()) root.endOfMedia() }
+          else if (mediaStatus === MediaPlayer.LoadedMedia) root.onVideoLoaded(player)
+        }
+        onErrorOccurred: function(err, message) { if (String(source) !== "") root.playerError("video", message) }
+      }
+
+      VideoOutput {
+        id: videoOut
+        anchors.fill: parent
+        fillMode: VideoOutput.PreserveAspectCrop
+      }
+
+      // Same gestures as the stock background underneath: double-click for the
+      // background picker, right double-click for the theme switcher.
+      MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.LeftButton | Qt.RightButton
+        onDoubleClicked: function(mouse) {
+          if (mouse.button === Qt.RightButton)
+            Quickshell.execDetached(["/usr/bin/bash", "-c", "theme=$(omarchy-theme-switcher); [[ -n $theme ]] && omarchy-theme-set \"$theme\" >/dev/null 2>&1 &"])
+          else
+            Quickshell.execDetached(["/usr/bin/bash", "-c", "background=$(omarchy-theme-bg-switcher); [[ -n $background ]] && omarchy-theme-bg-set \"$background\""])
+          mouse.accepted = true
+        }
       }
     }
   }

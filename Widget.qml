@@ -416,11 +416,18 @@ Panel {
             width: parent.width
             spacing: Style.space(8)
             Dropdown {
+              id: qualityDropdown
               width: Style.space(140)
               label: "Video quality"
               options: [{ value: "480", label: "480p" }, { value: "720", label: "720p" }, { value: "1080", label: "1080p" }]
-              value: String(root.cfg.quality || 720)
               fontFamily: root.fontFamily
+              // The dropdown assigns its own value on selection, which would
+              // break a binding; follow the config by hand instead.
+              Connections {
+                target: root
+                function onStatusChanged() { var v = String(root.cfg.quality || 720); if (qualityDropdown.value !== v) qualityDropdown.value = v }
+              }
+              Component.onCompleted: value = String(root.cfg.quality || 720)
               onChanged: function(v) { if (v !== String(root.cfg.quality || 720)) root.act(["quality", v]) }
             }
           }
