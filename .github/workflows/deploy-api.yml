@@ -31,5 +31,22 @@ jobs:
           test -n "$id"
           sed -i "s/\"database_id\": \"DATABASE_ID\"/\"database_id\": \"$id\"/" wrangler.jsonc
           npx --yes wrangler@4 d1 execute omarchy-fans-zen-ratings --remote --file schema.sql
-          npx --yes wrangler@4 deploy
-          echo "Set ratings_api in catalog.json to the workers.dev URL printed above." >> "$GITHUB_STEP_SUMMARY"
+          npx --yes wrangler@4 deploy 2>&1 | tee deploy.log
+          url=$(grep -oE 'https://[A-Za-z0-9.-]+\.workers\.dev' deploy.log | head -1)
+          test -n "$url"
+          curl -fsS --max-time 15 "$url/v1/health" | grep -q '"ok":true'
+          git checkout -- wrangler.jsonc
+          echo "RATINGS_API=$url" >> "$GITHUB_ENV"
+          echo "Ratings API: $url" >> "$GITHUB_STEP_SUMMARY"
+      - name: tell every install where the API is (catalog.json on main)
+        if: env.CF_READY == 'true'
+        run: |
+          set -euo pipefail
+          if [[ $(jq -r '.ratings_api // ""' catalog.json) == "$RATINGS_API" ]]; then echo "catalog.json already names $RATINGS_API"; exit 0; fi
+          jq --arg u "$RATINGS_API" '.ratings_api = $u' catalog.json > catalog.tmp && mv catalog.tmp catalog.json
+          git config user.name modpunk
+          git config user.email 27315771+modpunk@users.noreply.github.com
+          git add catalog.json
+          git commit -m "catalog: ratings API at $RATINGS_API"
+          git pull --rebase origin main
+          git push origin HEAD:main
