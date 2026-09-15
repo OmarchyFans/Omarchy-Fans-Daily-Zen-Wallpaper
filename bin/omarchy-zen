@@ -1,49 +1,49 @@
 #!/bin/bash
 #
-# omarchy-daily-zen — helper for the Daily Zen Wallpaper plugin
-# (fans.omarchy.daily-zen-wallpaper). The engine inside omarchy-shell
+# omarchy-zen — helper for the Zen Wallpaper plugin
+# (fans.omarchy.zen-wallpaper). The engine inside omarchy-shell
 # (Service.qml) and the bar chip (Widget.qml) call this for everything that
 # touches the network or the disk; you can call it too.
 #
-#   omarchy-daily-zen status [--json]          what is playing, the last still, the daily stamp
-#   omarchy-daily-zen set-url URL              use another YouTube video, live stream, playlist or channel
-#   omarchy-daily-zen mode animated|still|off  video under your windows, a still frame, or nothing
-#   omarchy-daily-zen sound on|off             play the stream's audio (also in still mode)
-#   omarchy-daily-zen volume 0..1              audio volume
-#   omarchy-daily-zen quality 480|720|1080     largest video height to decode
-#   omarchy-daily-zen daily-refresh on|off     a fresh still (and the newest video of a channel) every day
-#   omarchy-daily-zen daily-theme on|off       also rebuild the Aether theme every day
-#   omarchy-daily-zen fullscreen-pause on|off  pause while a window is fullscreen
-#   omarchy-daily-zen toggle-mode              animated <-> still (for a keybinding)
-#   omarchy-daily-zen pause | resume           pause or resume the engine
-#   omarchy-daily-zen position [save ID SECONDS]   where the stream is (the engine saves it every 30 s; a restart resumes there)
-#   omarchy-daily-zen resolve [--force]        ask yt-dlp for the stream URLs (cached until they expire)
-#   omarchy-daily-zen still [--at SEC] [--no-set]   grab one frame, make it the Omarchy background
-#   omarchy-daily-zen theme [--frame PATH] [--light] [--no-apply]   Aether palette from a frame -> Omarchy theme
-#   omarchy-daily-zen daily [--force]          the daily refresh (still, newest video, theme if enabled)
-#   omarchy-daily-zen open                     open the current video in the browser
-#   omarchy-daily-zen suno                     open the author's Suno invite (make your own music) in the browser
-#   omarchy-daily-zen library [--json] [--category ID | --channel ID | --bookmarks] [--refresh]
+#   omarchy-zen status [--json]          what is playing, the last still, the daily stamp
+#   omarchy-zen set-url URL              use another YouTube video, live stream, playlist or channel
+#   omarchy-zen mode animated|still|off  video under your windows, a still frame, or nothing
+#   omarchy-zen sound on|off             play the stream's audio (also in still mode)
+#   omarchy-zen volume 0..1              audio volume
+#   omarchy-zen quality 480|720|1080     largest video height to decode
+#   omarchy-zen daily-refresh on|off     a fresh still (and the newest video of a channel) every day
+#   omarchy-zen daily-theme on|off       also rebuild the Aether theme every day
+#   omarchy-zen fullscreen-pause on|off  pause while a window is fullscreen
+#   omarchy-zen toggle-mode              animated <-> still (for a keybinding)
+#   omarchy-zen pause | resume           pause or resume the engine
+#   omarchy-zen position [save ID SECONDS]   where the stream is (the engine saves it every 30 s; a restart resumes there)
+#   omarchy-zen resolve [--force]        ask yt-dlp for the stream URLs (cached until they expire)
+#   omarchy-zen still [--at SEC] [--no-set]   grab one frame, make it the Omarchy background
+#   omarchy-zen theme [--frame PATH] [--light] [--no-apply]   Aether palette from a frame -> Omarchy theme
+#   omarchy-zen daily [--force]          the daily refresh (still, newest video, theme if enabled)
+#   omarchy-zen open                     open the current video in the browser
+#   omarchy-zen suno                     open the author's Suno invite (make your own music) in the browser
+#   omarchy-zen library [--json] [--category ID | --channel ID | --bookmarks] [--refresh]
 #                                              the catalog (top 10 per category), a creator's latest, or your bookmarks,
 #                                              with your stars, everyone's average and what is playing
-#   omarchy-daily-zen play ID|URL              play a library entry (a video id, a video URL or a creator's channel)
-#   omarchy-daily-zen bookmark [list|add [ID|URL]|remove ID|toggle [ID]]   bookmarks (no id = what is playing)
-#   omarchy-daily-zen rate ID|URL 1..5         rate a video (0 removes); shared with every install unless share_ratings is off
-#   omarchy-daily-zen share-ratings on|off     share your stars and plays (one per video and day) with every install
-#   omarchy-daily-zen ratings [--refresh]      everyone's averages (cached an hour)
-#   omarchy-daily-zen channel [list|add URL|remove ID|videos ID [--refresh]]   creators to follow
-#   omarchy-daily-zen catalog [--refresh]      the curated list (fetched from the main branch once a day)
-#   omarchy-daily-zen update-check|update-dismiss|update-run   see docs/update-alerts.md
+#   omarchy-zen play ID|URL              play a library entry (a video id, a video URL or a creator's channel)
+#   omarchy-zen bookmark [list|add [ID|URL]|remove ID|toggle [ID]]   bookmarks (no id = what is playing)
+#   omarchy-zen rate ID|URL 1..5         rate a video (0 removes); shared with every install unless share_ratings is off
+#   omarchy-zen share-ratings on|off     share your stars and plays (one per video and day) with every install
+#   omarchy-zen ratings [--refresh]      everyone's averages (cached an hour)
+#   omarchy-zen channel [list|add URL|remove ID|videos ID [--refresh]]   creators to follow
+#   omarchy-zen catalog [--refresh]      the curated list (fetched from the main branch once a day)
+#   omarchy-zen update-check|update-dismiss|update-run   see docs/update-alerts.md
 #
 # Files:
-#   ~/.config/omarchy-daily-zen/config.json          settings (this script writes it; the engine watches it)
-#   ~/.local/state/omarchy-daily-zen/stream.json     the resolved stream (URLs expire after a few hours)
-#   ~/.local/state/omarchy-daily-zen/frame.json      the last still
-#   ~/.local/state/omarchy-daily-zen/daily.json      when the daily refresh last ran
-#   ~/.local/share/omarchy-daily-zen/frames/         still frames (the newest twelve are kept)
+#   ~/.config/omarchy-zen/config.json          settings (this script writes it; the engine watches it)
+#   ~/.local/state/omarchy-zen/stream.json     the resolved stream (URLs expire after a few hours)
+#   ~/.local/state/omarchy-zen/frame.json      the last still
+#   ~/.local/state/omarchy-zen/daily.json      when the daily refresh last ran
+#   ~/.local/share/omarchy-zen/frames/         still frames (the newest twelve are kept)
 #   ~/.config/omarchy/themes/<theme_name>/           the Aether theme, applied with omarchy-theme-set
-#   ~/.config/omarchy-daily-zen/bookmarks.json       your bookmarks; ratings.json your stars; channels.json creators you added
-#   ~/.cache/omarchy-daily-zen/catalog.json          the curated catalog (24 h); ratings.json everyone's averages (1 h)
+#   ~/.config/omarchy-zen/bookmarks.json       your bookmarks; ratings.json your stars; channels.json creators you added
+#   ~/.cache/omarchy-zen/catalog.json          the curated catalog (24 h); ratings.json everyone's averages (1 h)
 #
 # Network: yt-dlp talks to YouTube to resolve the stream, list a creator's
 # videos and name a bookmark; ffmpeg fetches one frame for a still; the engine
@@ -60,27 +60,32 @@ ROOT="$(cd -- "$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/.." && pwd)
 [[ -n ${DZ_TEST_STUBS:-} && $DZ_TEST_STUBS == "$ROOT/tests/stubs" ]] && PATH="$DZ_TEST_STUBS:$PATH"
 
 VERSION=$(jq -r '.version // "dev"' "$ROOT/manifest.json" 2>/dev/null || echo dev)
-CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy-daily-zen"
+# Daily Zen Wallpaper (0.3 and earlier) kept its files under omarchy-daily-zen: move them once.
+for _base in "${XDG_CONFIG_HOME:-$HOME/.config}" "${XDG_STATE_HOME:-$HOME/.local/state}" "${XDG_DATA_HOME:-$HOME/.local/share}" "${XDG_CACHE_HOME:-$HOME/.cache}"; do
+  [[ -d $_base/omarchy-daily-zen && ! -e $_base/omarchy-zen ]] && mv -- "$_base/omarchy-daily-zen" "$_base/omarchy-zen" 2>/dev/null
+done
+unset _base
+CONFIG_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy-zen"
 CONFIG="$CONFIG_DIR/config.json"
-STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy-daily-zen"
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy-zen"
 STREAM="$STATE_DIR/stream.json"
 FRAME_STATE="$STATE_DIR/frame.json"
 DAILY_STATE="$STATE_DIR/daily.json"
 POSITION_STATE="$STATE_DIR/position.json"   # where the stream was, so a shell restart resumes there
-FRAMES="${XDG_DATA_HOME:-$HOME/.local/share}/omarchy-daily-zen/frames"
+FRAMES="${XDG_DATA_HOME:-$HOME/.local/share}/omarchy-zen/frames"
 THEMES_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/themes"
 DEFAULT_URL="https://www.youtube.com/watch?v=vFJuk4U-V7Q"
-IPC_TARGET="daily-zen"
+IPC_TARGET="zen"
 KEEP_FRAMES=12
 
-die() { echo "omarchy-daily-zen: $*" >&2; exit 1; }
+die() { echo "omarchy-zen: $*" >&2; exit 1; }
 now() { date +%s; }
 
 # ---- config ------------------------------------------------------------------
 defaults() {
   jq -n --arg url "$DEFAULT_URL" '{
     url: $url, mode: "animated", sound: true, volume: 0.35, quality: 720,
-    daily_refresh: true, daily_theme: false, theme_name: "daily-zen",
+    daily_refresh: true, daily_theme: false, theme_name: "zen",
     pause_when_fullscreen: true, screen: "", update_check: true,
     share_ratings: true, ratings_api: "", install_id: "" }'
 }
@@ -266,13 +271,13 @@ cmd_still() {
   local -a seek=(); [[ -n $at ]] && seek=(-ss "$at")
   # -- is not an ffmpeg thing; the URL starts with https:// and the output with /.
   ffmpeg -v error -y -nostdin "${seek[@]}" -i "$video_url" -frames:v 1 -q:v 2 "$out" </dev/null \
-    || die "ffmpeg could not grab a frame (the stream URL may have expired: try 'omarchy-daily-zen resolve --force')"
+    || die "ffmpeg could not grab a frame (the stream URL may have expired: try 'omarchy-zen resolve --force')"
   [[ -s $out ]] || die "ffmpeg wrote no frame"
   prune_frames
   jq -n --arg path "$out" --arg id "$id" --arg at "${at:-}" --argjson taken "$(now)" \
     '{path: $path, video_id: $id, at: (if $at == "" then null else ($at | tonumber) end), taken: $taken}' | write_json "$FRAME_STATE"
   if (( set )); then
-    omarchy-theme-bg-set "$out" >/dev/null 2>&1 || echo "omarchy-daily-zen: omarchy-theme-bg-set failed; the frame is at $out" >&2
+    omarchy-theme-bg-set "$out" >/dev/null 2>&1 || echo "omarchy-zen: omarchy-theme-bg-set failed; the frame is at $out" >&2
   fi
   if (( json )); then cat "$FRAME_STATE"; elif (( ! quiet )); then echo "$out"; fi
 }
@@ -289,7 +294,7 @@ cmd_theme() {
       *) die "theme: unknown option $1" ;;
     esac; shift
   done
-  command -v aether >/dev/null 2>&1 || die "aether is not installed (it ships with Omarchy: sudo pacman -S aether)"
+  command -v aether >/dev/null 2>&1 || die "aether is not installed (it ships with Omarchy; install the aether package)"
   if [[ -z $frame ]]; then
     frame=$(jq -r '.path // ""' "$FRAME_STATE" 2>/dev/null || true)
     [[ -n $frame && -f $frame ]] || frame=$(cmd_still --no-set)
@@ -312,10 +317,10 @@ cmd_theme() {
   cp -- "$tmp/colors.toml" "$dest/colors.toml"
   cp -- "$frame" "$dest/backgrounds/$(basename -- "$frame")"
   cp -- "$frame" "$dest/preview.png"
-  printf '# %s\n\nMade by Daily Zen Wallpaper (fans.omarchy.daily-zen-wallpaper): Aether extracted this palette from\n%s\n\nRegenerate with: omarchy-daily-zen theme\n' "$name" "$frame" >"$dest/README.md"
+  printf '# %s\n\nMade by Zen Wallpaper (fans.omarchy.zen-wallpaper): Aether extracted this palette from\n%s\n\nRegenerate with: omarchy-zen theme\n' "$name" "$frame" >"$dest/README.md"
   rm -rf "$tmp"
   if (( apply )); then
-    omarchy-theme-set "$name" >/dev/null 2>&1 || echo "omarchy-daily-zen: omarchy-theme-set $name failed; the theme is at $dest" >&2
+    omarchy-theme-set "$name" >/dev/null 2>&1 || echo "omarchy-zen: omarchy-theme-set $name failed; the theme is at $dest" >&2
   fi
   if (( json )); then
     jq -n --arg name "$name" --arg dir "$dest" --arg frame "$frame" --argjson applied "$([[ $apply == 1 ]] && echo true || echo false)" \
@@ -359,7 +364,7 @@ cmd_status() {
     '{version: $version, config: $config, stream: $stream, frame: $frame, daily: $daily, engine: $engine, now: $now}')
   if (( json )); then echo "$out"; return 0; fi
   jq -r '
-    "Daily Zen Wallpaper \(.version)",
+    "Zen Wallpaper \(.version)",
     "  stream:  \(.config.url)",
     "  playing: \(if .stream then "\(.stream.title) — \(.stream.channel) (\(.stream.video_height)p\(if .stream.is_live then ", live" else "" end))" else "not resolved yet" end)",
     "  engine:  \(if .engine then "\(.engine.state)\(if .engine.error != "" then " — " + .engine.error else "" end)" else "not running (is the plugin enabled?)" end)",
@@ -394,19 +399,19 @@ cmd_open() {
 }
 
 # ---- library: catalog, creators, bookmarks, ratings ---------------------------
-CATALOG_RAW="${OMARCHY_DAILY_ZEN_RAW:-https://raw.githubusercontent.com/OmarchyFans/Omarchy-Fans-Daily-Zen-Wallpaper/main}"
-CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/omarchy-daily-zen"
+CATALOG_RAW="${OMARCHY_ZEN_RAW:-https://raw.githubusercontent.com/OmarchyFans/Omarchy-Fans-Zen-Wallpaper/main}"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/omarchy-zen"
 CATALOG_CACHE="$CACHE_DIR/catalog.json"
 RATINGS_CACHE="$CACHE_DIR/ratings.json"
 CHANNEL_CACHE="$CACHE_DIR/channels"
 BOOKMARKS="$CONFIG_DIR/bookmarks.json"
 MY_RATINGS="$CONFIG_DIR/ratings.json"
 MY_CHANNELS="$CONFIG_DIR/channels.json"
-CATALOG_TTL=${OMARCHY_DAILY_ZEN_CATALOG_TTL:-86400}
-RATINGS_TTL=${OMARCHY_DAILY_ZEN_RATINGS_TTL:-3600}
-CHANNEL_TTL=${OMARCHY_DAILY_ZEN_CHANNEL_TTL:-21600}
+CATALOG_TTL=${OMARCHY_ZEN_CATALOG_TTL:-86400}
+RATINGS_TTL=${OMARCHY_ZEN_RATINGS_TTL:-3600}
+CHANNEL_TTL=${OMARCHY_ZEN_CHANNEL_TTL:-21600}
 
-fetch() { curl -fsS --max-time 8 --max-filesize 3000000 -A "omarchy-daily-zen/$VERSION" "$@"; }
+fetch() { curl -fsS --max-time 8 --max-filesize 3000000 -A "omarchy-zen/$VERSION" "$@"; }
 fresh() { [[ -f $1 ]] && (( $(now) - $(stat -c %Y -- "$1") < $2 )); }
 json_file_or() { # json_file_or FILE JQ_TYPE_TEST DEFAULT
   if [[ -f $1 ]] && jq -e "$2" "$1" >/dev/null 2>&1; then cat "$1"; else echo "$3"; fi
@@ -426,7 +431,7 @@ catalog_file() {
   if [[ -f $CATALOG_CACHE ]]; then echo "$CATALOG_CACHE"; else echo "$ROOT/catalog.json"; fi
 }
 ratings_api() {
-  local a=${OMARCHY_DAILY_ZEN_RATINGS_API:-}
+  local a=${OMARCHY_ZEN_RATINGS_API:-}
   [[ -n $a ]] || a=$(cfg ratings_api)
   [[ -n $a && $a != null ]] || a=$(jq -r '.ratings_api // ""' "$(catalog_file)")
   (LC_ALL=C; [[ $a =~ ^https://[A-Za-z0-9._-]+(:[0-9]+)?(/[A-Za-z0-9._/-]*)?$ || $a =~ ^http://127\.0\.0\.1(:[0-9]+)?(/[A-Za-z0-9._/-]*)?$ ]]) || return 1
@@ -565,7 +570,7 @@ report_play() {
   api=$(ratings_api) || return 0
   iid=$(install_id)
   jq -nc --arg i "$iid" --arg v "$id" '{install_id: $i, video_id: $v}' \
-    | curl -fsS --max-time 4 -A "omarchy-daily-zen/$VERSION" -X POST -H 'content-type: application/json' --data @- "$api/v1/play" >/dev/null 2>&1 || true
+    | curl -fsS --max-time 4 -A "omarchy-zen/$VERSION" -X POST -H 'content-type: application/json' --data @- "$api/v1/play" >/dev/null 2>&1 || true
 }
 sync_pending() {
   local id stars
@@ -738,7 +743,7 @@ main() {
     update-run) exec bash "$ROOT/lib/update.sh" run "$@" ;;
     version|--version) echo "$VERSION" ;;
     help|-h|--help) usage ;;
-    *) echo "omarchy-daily-zen: unknown command '$cmd'" >&2; usage >&2; exit 2 ;;
+    *) echo "omarchy-zen: unknown command '$cmd'" >&2; usage >&2; exit 2 ;;
   esac
 }
 main "$@"

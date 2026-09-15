@@ -5,7 +5,7 @@ import Quickshell.Hyprland
 import QtQuick
 import QtMultimedia
 
-// Daily Zen Wallpaper engine (kind: service). Lives inside omarchy-shell for as
+// Zen Wallpaper engine (kind: service). Lives inside omarchy-shell for as
 // long as the plugin is enabled.
 //
 // One layer-shell window per monitor on the Bottom layer: above the stock
@@ -17,19 +17,19 @@ import QtMultimedia
 // YouTube's audio rendition, so "still + sound" and "animated, muted" are
 // just which players run.
 //
-// The helper writes ~/.config/omarchy-daily-zen/config.json; this file watches
+// The helper writes ~/.config/omarchy-zen/config.json; this file watches
 // it and reacts. YouTube URLs expire after a few hours and a 6-hour video
 // ends: both re-resolve and carry on (at the same position on expiry, from the
 // start on end of media). Once an hour it runs the daily refresh, which does
 // nothing until 24 hours have passed.
 //
-// IPC target "daily-zen": reload, refresh, pause, resume, status (JSON).
+// IPC target "zen": reload, refresh, pause, resume, status (JSON).
 Item {
   id: root
 
-  readonly property string cli: Qt.resolvedUrl("bin/omarchy-daily-zen").toString().replace(/^file:\/\//, "")
+  readonly property string cli: Qt.resolvedUrl("bin/omarchy-zen").toString().replace(/^file:\/\//, "")
   readonly property string home: Quickshell.env("HOME")
-  readonly property string configPath: (Quickshell.env("XDG_CONFIG_HOME") || (home + "/.config")) + "/omarchy-daily-zen/config.json"
+  readonly property string configPath: (Quickshell.env("XDG_CONFIG_HOME") || (home + "/.config")) + "/omarchy-zen/config.json"
   readonly property var cliEnv: ({ PATH: "/usr/share/omarchy/bin:/usr/local/bin:/usr/bin:/bin" })
 
   property var config: ({})
@@ -305,7 +305,7 @@ Item {
     stdout: StdioCollector { waitForEnd: true }
     stderr: StdioCollector { id: dailyErr; waitForEnd: true }
     onExited: function(code) {
-      if (code !== 0) console.warn("daily-zen: daily refresh failed:", String(dailyErr.text || "").trim())
+      if (code !== 0) console.warn("zen: daily refresh failed:", String(dailyErr.text || "").trim())
     }
   }
   Timer {
@@ -315,7 +315,7 @@ Item {
 
   // ---- IPC --------------------------------------------------------------------
   IpcHandler {
-    target: "daily-zen"
+    target: "zen"
     function reload(): void { configFile.reload() }
     function refresh(): void { if (root.needStream) root.resolve(false, "refresh") }
     function pause(): void { root.paused = true; syncSoon.restart() }
@@ -354,7 +354,7 @@ Item {
       visible: wanted && player.hasVideo
       anchors { top: true; bottom: true; left: true; right: true }
       color: "black"
-      WlrLayershell.namespace: "omarchy-fans-daily-zen"
+      WlrLayershell.namespace: "omarchy-fans-zen"
       WlrLayershell.layer: WlrLayer.Bottom
       WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
       exclusionMode: ExclusionMode.Ignore

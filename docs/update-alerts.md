@@ -132,10 +132,10 @@ Environment for tests: `OMARCHY_PLUGIN_UPDATE_RAW` (base URL, `file://` works),
 
 ## In this plugin
 
-- Kind: service (`Service.qml`, the engine) plus a bar widget with a popup (`Widget.qml`); helper `bin/omarchy-daily-zen` (bash).
-- Helper commands: `omarchy-daily-zen update-check [VERSION] [--force]`, `update-dismiss VERSION`, `update-run [all|install]`, all delegating to `lib/update.sh`.
+- Kind: service (`Service.qml`, the engine) plus a bar widget with a popup (`Widget.qml`); helper `bin/omarchy-zen` (bash).
+- Helper commands: `omarchy-zen update-check [VERSION] [--force]`, `update-dismiss VERSION`, `update-run [all|install]`, all delegating to `lib/update.sh`.
 - Version places: `manifest.json` (the helper reads it at run time), `CHANGELOG.md`.
-- Cache: `~/.cache/omarchy-daily-zen/update-check.json`. Opt-out: `"update_check": false` in `~/.config/omarchy-daily-zen/config.json`, or the chip's `update_check` setting in shell.json.
+- Cache: `~/.cache/omarchy-zen/update-check.json`. Opt-out: `"update_check": false` in `~/.config/omarchy-zen/config.json`, or the chip's `update_check` setting in shell.json.
 - `UPD_KEEP_LOADED=1`: the engine is a service that lives inside the shell, so the update terminal offers `omarchy restart shell` as its last step. No other post-update step.
 - No mismatch case: `install.sh` symlinks the helper, so the plugin folder is the only copy.
 - Tests: `tests/run.sh update` runs the check against `file://` fixtures in `tests/fixtures/published`.

@@ -1,4 +1,4 @@
-// Daily Zen Wallpaper ratings API: a Cloudflare Worker over D1.
+// Zen Wallpaper ratings API: a Cloudflare Worker over D1.
 //
 //   GET  /v1/health            {ok: true}
 //   GET  /v1/ratings           {"<video_id>": {avg, count, plays}, ...}   (every rated or played video; cached 60 s)

@@ -5,23 +5,23 @@ import Quickshell.Io
 import qs.Commons
 import qs.Ui
 
-// Daily Zen Wallpaper: the bar chip and its popup.
+// Zen Wallpaper: the bar chip and its popup.
 //
 //   left click    open the popup (mode, sound, stills, theme, stream URL)
 //   middle click  animated <-> still
 //   scroll        volume
 //
-// Everything shown comes from `omarchy-daily-zen status --json`; every action
+// Everything shown comes from `omarchy-zen status --json`; every action
 // is a fixed argv through Util.execArgv, so nothing typed here reaches a shell
 // as code. The engine itself is Service.qml; the two talk through the config
-// file and the "daily-zen" IPC target, never directly.
+// file and the "zen" IPC target, never directly.
 Panel {
   id: root
-  moduleName: "fans.omarchy.daily-zen-wallpaper"
-  ipcTarget: "fans.omarchy.daily-zen-wallpaper"
+  moduleName: "fans.omarchy.zen-wallpaper"
+  ipcTarget: "fans.omarchy.zen-wallpaper"
   manageIpc: false
 
-  readonly property string cli: Qt.resolvedUrl("bin/omarchy-daily-zen").toString().replace(/^file:\/\//, "")
+  readonly property string cli: Qt.resolvedUrl("bin/omarchy-zen").toString().replace(/^file:\/\//, "")
   readonly property color foreground: bar ? bar.foreground : Color.foreground
   readonly property color dim: Qt.darker(foreground, 1.55)
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
@@ -208,7 +208,7 @@ Panel {
   }
   function stateText() {
     if (!root.status) return root.error ? root.error : "Loading…"
-    if (!root.engineUp) return "Engine not running. Enable the plugin (omarchy plugin enable fans.omarchy.daily-zen-wallpaper) or restart the shell."
+    if (!root.engineUp) return "Engine not running. Enable the plugin (omarchy plugin enable fans.omarchy.zen-wallpaper) or restart the shell."
     var s = root.engineState
     var head = s === "playing" ? (root.mode === "animated" ? "Playing" : (root.sound ? "Playing sound, still wallpaper" : "Still wallpaper"))
       : s === "paused" ? "Paused"
@@ -237,7 +237,7 @@ Panel {
     text: root.modeIcon()
     slotSize: Style.bar.statusSlot
     fontSize: Style.font.caption
-    tooltipText: "Daily Zen Wallpaper"
+    tooltipText: "Zen Wallpaper"
       + (root.stream && root.stream.title ? " · " + root.stream.title : "")
       + " — " + root.stateText() + " · middle-click: animated / still, scroll: volume"
       + (root.updateAvailable ? " · " + root.updateInfo.latest + " is available" : (root.updateMismatch ? " · finish updating" : ""))
@@ -302,7 +302,7 @@ Panel {
 
           PanelHero {
             width: parent.width
-            title: "Daily Zen Wallpaper"
+            title: "Zen Wallpaper"
             meta: (root.stream && root.stream.title ? root.stream.title + (root.stream.channel ? " — " + root.stream.channel : "") + "\n" : "") + root.stateText()
           }
 
@@ -328,8 +328,8 @@ Panel {
                 Text {
                   width: parent.width; wrapMode: Text.Wrap; textFormat: Text.PlainText
                   text: root.updateAvailable
-                        ? "Daily Zen Wallpaper " + root.updateInfo.latest + " is available (you have " + root.version + ")"
-                        : "Finish updating Daily Zen Wallpaper: the chip is " + root.version + ", its helper is " + (root.updateInfo ? root.updateInfo.cli : "")
+                        ? "Zen Wallpaper " + root.updateInfo.latest + " is available (you have " + root.version + ")"
+                        : "Finish updating Zen Wallpaper: the chip is " + root.version + ", its helper is " + (root.updateInfo ? root.updateInfo.cli : "")
                   color: root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body; font.bold: true
                 }
                 Repeater {
@@ -449,7 +449,7 @@ Panel {
             }
             Button {
               text: "Make a theme with Aether"; iconText: "󰏘"; foreground: Color.accent; fontFamily: root.fontFamily
-              tooltipText: "Aether extracts a palette from the last still and applies it as the Omarchy theme \"" + (root.cfg.theme_name || "daily-zen") + "\" (terminals restart)"
+              tooltipText: "Aether extracts a palette from the last still and applies it as the Omarchy theme \"" + (root.cfg.theme_name || "zen") + "\" (terminals restart)"
               onClicked: root.act(["theme"])
             }
             Button {
@@ -692,7 +692,7 @@ Panel {
           Text {
             width: parent.width; wrapMode: Text.WordWrap; textFormat: Text.PlainText
             color: root.dim; font.family: root.fontFamily; font.pixelSize: Style.font.caption
-            text: "The stream plays live from YouTube through yt-dlp; only still frames are saved (~/.local/share/omarchy-daily-zen/frames). Command line: omarchy-daily-zen."
+            text: "The stream plays live from YouTube through yt-dlp; only still frames are saved (~/.local/share/omarchy-zen/frames). Command line: omarchy-zen.\nZen Wallpaper " + root.version + " · an Omarchy.Fans product by ModPunk · MIT"
           }
         }
       }

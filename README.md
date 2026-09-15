@@ -1,14 +1,23 @@
-# Daily Zen Wallpaper for Omarchy
+# Zen Wallpaper for Omarchy
 
-**Turn a long YouTube mood stream into your Omarchy wallpaper: animated, with
-sound, under every window; or a fresh still frame every day; and one click asks
-Aether to make an Omarchy theme out of the scene.** Point it at any lofi, zen,
-ambient or nature channel and the desktop follows the music.
+Another [Omarchy.Fans](https://omarchy.fans) product, written by ModPunk.
+
+- **Your wallpaper becomes a live YouTube stream.** Pick a long-form mood
+  stream (lofi, zen, ambient, jazz, rain, a 24/7 radio) and it plays on the
+  layer under your windows, picture and sound, straight from YouTube.
+- **Many streams to choose from.** A curated library of the ten most popular
+  streams in each of eleven categories, any creator you follow (their newest
+  upload, checked daily), or any YouTube link you paste. Bookmark the ones you
+  like, rate them, and see what every other install plays and rates.
+- **Or a still.** Prefer a picture? One frame from the stream becomes your
+  Omarchy background, and a fresh one every day; the music can keep playing.
+- **Themes from the scene.** One click asks Aether, Omarchy's theme generator,
+  to build and apply an Omarchy theme from the current frame.
+- **Totally free.** MIT licensed, open source, no account, no sign-up, nothing
+  to pay; the only thing it needs is a YouTube stream to point at.
 
 The default stream is [KUMAMICHI — Japanese Zen Music Along the Bear's Path](https://www.youtube.com/watch?v=vFJuk4U-V7Q)
-by Aether Journey. Give it any other YouTube video, live stream, playlist or
-channel and it plays that instead (for a channel or playlist, the newest
-upload, checked every day).
+by Aether Journey, and that creator is the first entry in the Library selector.
 
 ## Features
 
@@ -21,7 +30,7 @@ upload, checked every day).
 - **Sound without video.** Still mode keeps the music playing if you want it.
 - **Themes with Aether.** *Make a theme with Aether* hands the current still to
   [Aether](https://github.com/omacom/aether), Omarchy's bundled theme generator,
-  and applies the result as the Omarchy theme `daily-zen`. Turn on *Daily theme*
+  and applies the result as the Omarchy theme `zen`. Turn on *Daily theme*
   and the palette follows the picture every day.
 - **Bar chip.** Left click opens the popup (mode, sound, volume, quality, the
   stream URL, daily options). Middle click flips animated and still. Scroll
@@ -43,7 +52,7 @@ upload, checked every day).
   install through a small API, so each row shows everyone's average, how many
   installs played it, and the YouTube views or live viewers as of the catalog
   build. The selector counts your bookmarks per category and per creator.
-  `omarchy-daily-zen share-ratings off` keeps stars and plays on this machine.
+  `omarchy-zen share-ratings off` keeps stars and plays on this machine.
 - **Picks up where it left off.** The engine saves the playback position every
   30 seconds; after a shell restart or a reboot the same video resumes there.
 - **Update alerts.** The popup tells you when a newer version is published and
@@ -52,37 +61,42 @@ upload, checked every day).
 ## How it works
 
 Enable the plugin and the engine (a `service` plugin inside `omarchy-shell`)
-reads `~/.config/omarchy-daily-zen/config.json`, asks `omarchy-daily-zen resolve`
+reads `~/.config/omarchy-zen/config.json`, asks `omarchy-zen resolve`
 for the stream, and plays it in a layer-shell window per monitor on the
 *bottom* layer, shown only once the first frame is decoded. Each window's Qt
 Multimedia player decodes the 720p HLS video rendition (no audio output), and
 one more player plays the audio rendition, so "still + sound" and "animated,
 muted" are just which players run. YouTube URLs expire after a few hours and a 6-hour
 video ends: the engine re-resolves and carries on. Once an hour it runs
-`omarchy-daily-zen daily`, which does nothing until a day has passed.
+`omarchy-zen daily`, which does nothing until a day has passed.
 
-Everything that touches the network or the disk is in `bin/omarchy-daily-zen`:
+Everything that touches the network or the disk is in `bin/omarchy-zen`:
 `resolve` (yt-dlp), `still` (ffmpeg grabs one frame), `theme` (Aether), `daily`.
 The chip and the engine only ever call it with fixed arguments.
 
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/OmarchyFans/Omarchy-Fans-Daily-Zen-Wallpaper --enable
-~/.config/omarchy/plugins/fans.omarchy.daily-zen-wallpaper/install.sh
+omarchy plugin add https://github.com/OmarchyFans/Omarchy-Fans-Zen-Wallpaper --enable
+~/.config/omarchy/plugins/fans.omarchy.zen-wallpaper/install.sh
 ```
 
-`install.sh` asks, step by step, whether to symlink `omarchy-daily-zen` into
+Upgrading from *Daily Zen Wallpaper* (0.3 and earlier): run its `uninstall.sh`,
+`omarchy plugin remove fans.omarchy.daily-zen-wallpaper`, then install as
+above. Your bookmarks, ratings, settings and still frames move to the new
+folders on the first run.
+
+`install.sh` asks, step by step, whether to symlink `omarchy-zen` into
 `~/.local/bin`, bind `SUPER + ALT + Z` to flip animated/still, and grab a first
 still. Every step is optional and idempotent; config files are backed up before
-they are appended to; nothing runs with sudo.
+they are appended to; nothing needs root privileges.
 
 `--enable` puts the chip in the right section of the bar (move it with
 `omarchy bar move`) and starts the engine with it: the default stream begins
 playing with sound at 35 % right away, and within the first minute the daily
 refresh saves a still and makes it the Omarchy background. Switch to *Still*
 or *Off* in the popup if you only wanted the picture. If the chip is missing,
-run `omarchy plugin enable fans.omarchy.daily-zen-wallpaper` or use Setup > Plugins.
+run `omarchy plugin enable fans.omarchy.zen-wallpaper` or use Setup > Plugins.
 
 ### Dependencies
 
@@ -93,44 +107,44 @@ All part of the Omarchy base install: `yt-dlp`, `ffmpeg`, `jq`, `aether`,
 ## Remove
 
 ```bash
-~/.config/omarchy/plugins/fans.omarchy.daily-zen-wallpaper/uninstall.sh   # add --purge to delete frames, the theme and settings
-omarchy plugin remove fans.omarchy.daily-zen-wallpaper
+~/.config/omarchy/plugins/fans.omarchy.zen-wallpaper/uninstall.sh   # add --purge to delete frames, the theme and settings
+omarchy plugin remove fans.omarchy.zen-wallpaper
 ```
 
 `uninstall.sh` removes the symlink and the keybinding and, if a still frame is
 the current background, goes back to the theme's own picture. Your still
-frames, the `daily-zen` theme and the settings stay unless you pass `--purge`.
+frames, the `zen` theme and the settings stay unless you pass `--purge`.
 To stop using the generated theme, pick another one in the theme switcher.
 
 ## Commands
 
 ```
-omarchy-daily-zen status [--json]          what is playing, the last still, the daily stamp
-omarchy-daily-zen set-url URL              use another YouTube video, live stream, playlist or channel
-omarchy-daily-zen mode animated|still|off
-omarchy-daily-zen sound on|off             volume 0..1 | quality 480|720|1080
-omarchy-daily-zen toggle-mode              animated <-> still (for a keybinding)
-omarchy-daily-zen pause | resume
-omarchy-daily-zen still [--at SEC] [--no-set]        one frame -> Omarchy background
-omarchy-daily-zen theme [--frame PATH] [--light] [--no-apply]   Aether palette -> Omarchy theme
-omarchy-daily-zen daily [--force]          the daily refresh
-omarchy-daily-zen daily-refresh on|off | daily-theme on|off | fullscreen-pause on|off
-omarchy-daily-zen open                     the current video in the browser
-omarchy-daily-zen library [--json] [--category ID | --channel ID | --bookmarks] [--refresh]
-omarchy-daily-zen play ID|URL|CREATOR      play a library entry, any YouTube video, or a creator's newest
-omarchy-daily-zen bookmark [list|add [ID]|remove ID|toggle [ID]]
-omarchy-daily-zen rate ID 1..5             0 removes; shared unless share-ratings off
-omarchy-daily-zen ratings [--refresh]      everyone's averages
-omarchy-daily-zen channel [list|add URL|remove ID|videos ID]
-omarchy-daily-zen catalog [--refresh]      the curated list
-omarchy-daily-zen position                 where the stream is (saved every 30 s)
+omarchy-zen status [--json]          what is playing, the last still, the daily stamp
+omarchy-zen set-url URL              use another YouTube video, live stream, playlist or channel
+omarchy-zen mode animated|still|off
+omarchy-zen sound on|off             volume 0..1 | quality 480|720|1080
+omarchy-zen toggle-mode              animated <-> still (for a keybinding)
+omarchy-zen pause | resume
+omarchy-zen still [--at SEC] [--no-set]        one frame -> Omarchy background
+omarchy-zen theme [--frame PATH] [--light] [--no-apply]   Aether palette -> Omarchy theme
+omarchy-zen daily [--force]          the daily refresh
+omarchy-zen daily-refresh on|off | daily-theme on|off | fullscreen-pause on|off
+omarchy-zen open                     the current video in the browser
+omarchy-zen library [--json] [--category ID | --channel ID | --bookmarks] [--refresh]
+omarchy-zen play ID|URL|CREATOR      play a library entry, any YouTube video, or a creator's newest
+omarchy-zen bookmark [list|add [ID]|remove ID|toggle [ID]]
+omarchy-zen rate ID 1..5             0 removes; shared unless share-ratings off
+omarchy-zen ratings [--refresh]      everyone's averages
+omarchy-zen channel [list|add URL|remove ID|videos ID]
+omarchy-zen catalog [--refresh]      the curated list
+omarchy-zen position                 where the stream is (saved every 30 s)
 ```
 
-Settings live in `~/.config/omarchy-daily-zen/config.json` (the helper writes
+Settings live in `~/.config/omarchy-zen/config.json` (the helper writes
 it, the engine watches it); `screen` names one monitor to draw on (empty =
 every monitor; each one decodes the video itself). Still frames are kept in
-`~/.local/share/omarchy-daily-zen/frames/` (the newest twelve). The Aether
-theme is `~/.config/omarchy/themes/daily-zen/` (`theme_name` in the config):
+`~/.local/share/omarchy-zen/frames/` (the newest twelve). The Aether
+theme is `~/.config/omarchy/themes/zen/` (`theme_name` in the config):
 only `colors.toml` and the frame are copied there, so Omarchy 4 renders every
 other file from its own templates.
 
@@ -146,7 +160,7 @@ other file from its own templates.
   random install id made on first use (no account, no name), the video id and
   the stars. Switching to another video sends the install id and the video id
   once (the API counts one play per install, video and day). Averages and
-  play counts are fetched once an hour. `omarchy-daily-zen share-ratings off`
+  play counts are fetched once an hour. `omarchy-zen share-ratings off`
   keeps both local. The API (`api/`) stores only those rows and counts
   requests per IP for a minute to cap writes; no names, accounts or IPs.
 - The Suno link at the top of the popup opens the author's invite page in your
@@ -164,7 +178,7 @@ never through a shell.
 The popup shows a banner when a newer version is published, with the changelog
 bullets, and *Update…* opens a terminal where `omarchy plugin update` shows the
 diff and asks, `install.sh` asks, and a shell restart loads the new engine. By
-hand: `omarchy plugin update fans.omarchy.daily-zen-wallpaper`, then
+hand: `omarchy plugin update fans.omarchy.zen-wallpaper`, then
 `omarchy restart shell`. Details in [docs/update-alerts.md](docs/update-alerts.md).
 
 ## Ratings API
@@ -205,9 +219,9 @@ on every saved file). Layout:
 
 ```
 manifest.json        kinds: service (engine) + bar-widget (chip)
-Service.qml          the engine: layer window, two MediaPlayers, expiry/loop, daily timer, IPC "daily-zen"
+Service.qml          the engine: layer window, two MediaPlayers, expiry/loop, daily timer, IPC "zen"
 Widget.qml           the bar chip and popup
-bin/omarchy-daily-zen   resolve / still / theme / daily / settings (bash + jq)
+bin/omarchy-zen   resolve / still / theme / daily / settings (bash + jq)
 lib/update.sh        update alerts (shared across Omarchy.Fans plugins)
 install.sh uninstall.sh
 catalog.json         the curated library (tools/build-catalog.sh rebuilds it)
@@ -216,4 +230,9 @@ tests/run.sh         offline tests; tests/stubs, tests/fixtures; `tests/run.sh a
 docs/update-alerts.md
 ```
 
-MIT.
+## License and credits
+
+MIT. Free to use, copy, change and share; see [LICENSE](LICENSE). The streams
+belong to their creators on YouTube. Zen Wallpaper is an Omarchy.Fans product
+written by ModPunk; the update alert, the helper layout and the offline test
+harness are shared with the other Omarchy.Fans plugins.

@@ -1,4 +1,4 @@
--- Daily Zen Wallpaper community ratings. One row per install and video.
+-- Zen Wallpaper community ratings. One row per install and video.
 CREATE TABLE IF NOT EXISTS ratings (
   install_id TEXT NOT NULL,
   video_id   TEXT NOT NULL,

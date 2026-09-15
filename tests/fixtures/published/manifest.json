@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "id": "fans.omarchy.daily-zen-wallpaper",
-  "name": "Daily Zen Wallpaper",
+  "id": "fans.omarchy.zen-wallpaper",
+  "name": "Zen Wallpaper",
   "version": "9.9.9",
   "author": "modpunk (omarchy.fans)",
   "license": "MIT",
@@ -15,12 +15,12 @@
     "barWidget": "Widget.qml"
   },
   "barWidget": {
-    "displayName": "Daily Zen Wallpaper",
+    "displayName": "Zen Wallpaper",
     "description": "Zen chip: play or pause the stream wallpaper, mute it, grab a still, or make an Aether theme from the scene.",
     "category": "System",
     "aliases": [
       "zen",
-      "daily-zen",
+      "zen",
       "wallpaper"
     ],
     "allowMultiple": false,

@@ -1,4 +1,4 @@
-// Daily Zen Wallpaper ratings API. Deployed by .github/workflows/deploy-api.yml,
+// Zen Wallpaper ratings API. Deployed by .github/workflows/deploy-api.yml,
 // which creates the D1 database on first run and fills DATABASE_ID below.
 {
   "$schema": "node_modules/wrangler/config-schema.json",

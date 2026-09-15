@@ -3,6 +3,12 @@
 The bar popup reads the newest sections of this file to tell you what changed
 when an update is available. Keep one short line per bullet.
 
+## 0.4.0
+
+- Renamed to Zen Wallpaper (repository Omarchy-Fans-Zen-Wallpaper, plugin id fans.omarchy.zen-wallpaper, command omarchy-zen)
+- Upgrading from Daily Zen Wallpaper: run its uninstall.sh, remove the old plugin, add this one; bookmarks, ratings and settings move over on first run
+- Marketplace release: README and listing explain how the wallpaper becomes a stream, the library of streams, and the MIT license
+
 ## 0.3.0
 
 - Library rows show YouTube views (or viewers for live streams) and how often every install played the stream
@@ -31,5 +37,5 @@ when an update is available. Keep one short line per bullet.
 - Animated wallpaper from a YouTube mood stream, with sound, on the layer under your windows
 - Still mode: a fresh frame from the stream becomes your Omarchy background every day
 - "Make a theme": Aether extracts a palette from the current scene and applies it as an Omarchy theme
-- Bar chip with mode, sound, volume, quality and daily options; `omarchy-daily-zen` command line
+- Bar chip with mode, sound, volume, quality and daily options; `omarchy-zen` command line
 - Update alerts in the popup when a newer version is published

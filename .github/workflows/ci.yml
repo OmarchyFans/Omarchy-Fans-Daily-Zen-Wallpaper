@@ -9,8 +9,8 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq jq shellcheck
       - name: syntax
         run: |
-          bash -n bin/omarchy-daily-zen lib/update.sh install.sh uninstall.sh tests/run.sh
-          shellcheck -S warning bin/omarchy-daily-zen lib/update.sh install.sh uninstall.sh
+          bash -n bin/omarchy-zen lib/update.sh install.sh uninstall.sh tests/run.sh
+          shellcheck -S warning bin/omarchy-zen lib/update.sh install.sh uninstall.sh
       - name: manifest
         run: |
           jq -e '.schemaVersion == 1 and (.id | startswith("omarchy.") | not) and (.kinds | index("service")) and (.kinds | index("bar-widget"))' manifest.json

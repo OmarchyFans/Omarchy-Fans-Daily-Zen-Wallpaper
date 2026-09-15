@@ -1,2 +1,4 @@
 .claude/
 __pycache__/
+api/.wrangler/
+api/node_modules/

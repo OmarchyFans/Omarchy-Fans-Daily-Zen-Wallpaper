@@ -1,7 +1,7 @@
 # Ratings API
 
 A Cloudflare Worker over D1 that collects the 1–5 star ratings from every
-install of Daily Zen Wallpaper and hands the averages back. `worker.js` is the
+install of Zen Wallpaper and hands the averages back. `worker.js` is the
 whole service; `schema.sql` the two tables.
 
 Deploy: `.github/workflows/deploy-api.yml` runs on every push that touches
@@ -16,5 +16,5 @@ id, `npx wrangler d1 execute omarchy-fans-zen-ratings --remote --file schema.sql
 `npx wrangler deploy`.
 
 Local: `npx wrangler dev --local` (an emulated D1; `tests/run.sh api` uses it
-when it is running on 127.0.0.1:8787, `OMARCHY_DAILY_ZEN_RATINGS_API` points the
+when it is running on 127.0.0.1:8787, `OMARCHY_ZEN_RATINGS_API` points the
 CLI at any instance).

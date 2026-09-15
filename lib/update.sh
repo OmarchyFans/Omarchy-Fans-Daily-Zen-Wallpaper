@@ -28,12 +28,12 @@ UPD_SELF="$(readlink -f -- "${BASH_SOURCE[0]}")"
 UPD_DIR="$(cd -- "$(dirname -- "$UPD_SELF")/.." && pwd)"
 
 # ---- this plugin -------------------------------------------------------------
-UPD_ID="fans.omarchy.daily-zen-wallpaper"
-UPD_NAME="Daily Zen Wallpaper"
-UPD_REPO="OmarchyFans/Omarchy-Fans-Daily-Zen-Wallpaper"            # GitHub owner/repo the plugin is published from
+UPD_ID="fans.omarchy.zen-wallpaper"
+UPD_NAME="Zen Wallpaper"
+UPD_REPO="OmarchyFans/Omarchy-Fans-Zen-Wallpaper"            # GitHub owner/repo the plugin is published from
 UPD_BRANCH="main"        # branch whose manifest.json is "the published version"
-UPD_SLUG="omarchy-daily-zen"            # cache lives in ~/.cache/<slug>/update-check.json
-UPD_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy-daily-zen/config.json"        # JSON file; "update_check": false turns the check off
+UPD_SLUG="omarchy-zen"            # cache lives in ~/.cache/<slug>/update-check.json
+UPD_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/omarchy-zen/config.json"        # JSON file; "update_check": false turns the check off
 UPD_KEEP_LOADED=1   # the wallpaper engine is a service that lives inside the shell: a restart loads the new one
 UPD_BUILT_STAMP=""    # file install.sh writes with the version it built for, or empty
 # Runs in the update terminal after install.sh. Ask before anything that is not
