@@ -3,6 +3,14 @@
 The bar popup reads the newest sections of this file to tell you what changed
 when an update is available. Keep one short line per bullet.
 
+## 0.3.0
+
+- Library rows show YouTube views (or viewers for live streams) and how often every install played the stream
+- The Library selector counts your bookmarks per category and per creator
+- The row you pick lights up as playing right away; the chip refreshes every 10 s
+- Chip icon: pause while the stream plays, play while it is paused (the media convention)
+- Plays are counted once per install and day and shared like the stars; share-ratings off keeps them local
+
 ## 0.2.0
 
 - Library: the ten most popular long streams per category (lofi, work, study, focus, zen, ambient, jazz, sleep, classical, synthwave, 24/7 streams), refreshed from the main branch daily

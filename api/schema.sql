@@ -13,3 +13,11 @@ CREATE TABLE IF NOT EXISTS budget (
   win    INTEGER NOT NULL,
   n      INTEGER NOT NULL
 );
+-- One play per install, video and day: restarts and re-resolves do not inflate it.
+CREATE TABLE IF NOT EXISTS plays (
+  install_id TEXT NOT NULL,
+  video_id   TEXT NOT NULL,
+  day        TEXT NOT NULL,
+  PRIMARY KEY (install_id, video_id, day)
+);
+CREATE INDEX IF NOT EXISTS plays_video ON plays (video_id);

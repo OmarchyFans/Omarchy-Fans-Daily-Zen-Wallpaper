@@ -1,8 +1,9 @@
 // Daily Zen Wallpaper ratings API: a Cloudflare Worker over D1.
 //
 //   GET  /v1/health            {ok: true}
-//   GET  /v1/ratings           {"<video_id>": {avg, count}, ...}   (every rated video; cached 60 s)
+//   GET  /v1/ratings           {"<video_id>": {avg, count, plays}, ...}   (every rated or played video; cached 60 s)
 //   POST /v1/rate              {install_id, video_id, stars}  ->  {video_id, avg, count}
+//   POST /v1/play              {install_id, video_id}         ->  {video_id, plays}   (one per install and day)
 //
 // The install id is a random uuid the plugin makes on first use; there is no
 // account, no name, no IP stored (the IP is only counted for 60 seconds to cap
@@ -35,11 +36,31 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (request.method === "GET" && url.pathname === "/v1/health") return json({ ok: true });
-    if (request.method === "GET" && url.pathname === "/v1/ratings") {
-      const { results } = await env.DB.prepare("SELECT video_id, AVG(stars) AS avg, COUNT(*) AS count FROM ratings GROUP BY video_id").all();
+    if (request.method === "GET" && (url.pathname === "/v1/ratings" || url.pathname === "/v1/stats")) {
+      const rated = await env.DB.prepare("SELECT video_id, AVG(stars) AS avg, COUNT(*) AS count FROM ratings GROUP BY video_id").all();
+      const played = await env.DB.prepare("SELECT video_id, COUNT(*) AS plays FROM plays GROUP BY video_id").all();
       const out = {};
-      for (const r of results || []) out[r.video_id] = { avg: Math.round(r.avg * 100) / 100, count: r.count };
+      for (const r of rated.results || []) out[r.video_id] = { avg: Math.round(r.avg * 100) / 100, count: r.count, plays: 0 };
+      for (const p of played.results || []) {
+        if (!out[p.video_id]) out[p.video_id] = { avg: 0, count: 0, plays: 0 };
+        out[p.video_id].plays = p.plays;
+      }
       return json(out, 200, { "cache-control": "public, max-age=60" });
+    }
+    if (request.method === "POST" && url.pathname === "/v1/play") {
+      const len = Number(request.headers.get("content-length") || 0);
+      if (len > 512) return json({ error: "body too large" }, 413);
+      let body;
+      try { body = await request.json(); } catch (e) { return json({ error: "bad json" }, 400); }
+      const installId = String(body.install_id || ""), videoId = String(body.video_id || "");
+      if (!UUID.test(installId)) return json({ error: "bad install_id" }, 400);
+      if (!VIDEO.test(videoId)) return json({ error: "bad video_id" }, 400);
+      const ip = request.headers.get("cf-connecting-ip") || "local";
+      if (!(await allowed(env, ip))) return json({ error: "slow down" }, 429, { "retry-after": "60" });
+      const day = new Date().toISOString().slice(0, 10);
+      await env.DB.prepare("INSERT OR IGNORE INTO plays (install_id, video_id, day) VALUES (?, ?, ?)").bind(installId, videoId, day).run();
+      const row = await env.DB.prepare("SELECT COUNT(*) AS plays FROM plays WHERE video_id = ?").bind(videoId).first();
+      return json({ video_id: videoId, plays: row ? row.plays : 0 });
     }
     if (request.method === "POST" && url.pathname === "/v1/rate") {
       const len = Number(request.headers.get("content-length") || 0);

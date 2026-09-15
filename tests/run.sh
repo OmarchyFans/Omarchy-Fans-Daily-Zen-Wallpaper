@@ -164,6 +164,7 @@ if want library; then
   out=$("$B" library --json) || tfail "library exited $?"
   [[ $(j .kind "$out") == category && $(j .category "$out") == zen && $(j '.entries|length' "$out") == 2 && $(j .ratings_api_available "$out") == true ]] && tok || tfail "library default: $(j '{kind,category,ratings_api_available}' "$out")"
   [[ $(j '.entries[0].avg' "$out") == 4.6 && $(j '.entries[0].count' "$out") == 12 && $(j '.entries[0].my_stars' "$out") == 0 && $(j '.entries[0].bookmarked' "$out") == false ]] && tok || tfail "community ratings merged: $(j '.entries[0]' "$out")"
+  [[ $(j '.entries[0].plays' "$out") == 150 && $(j '.entries[0].views' "$out") == 500000 && $(j '.entries[1].plays' "$out") == 3 && $(j '.entries[1].viewers' "$out") == 300 ]] && tok || tfail "plays, views and viewers on rows: $(j '[.entries[].plays, .entries[].views]' "$out")"
   [[ $(j '.channels[0].id' "$out") == AetherJourneyMusic && $(j '.categories|length' "$out") == 2 ]] && tok || tfail "channels + categories"
   [[ -f $XDG_CACHE_HOME/omarchy-daily-zen/catalog.json && -f $XDG_CACHE_HOME/omarchy-daily-zen/ratings.json ]] && tok || tfail "caches written"
   : >"$DZ_LOG"; "$B" library --json >/dev/null; [[ -z $(grep curl "$DZ_LOG") ]] && tok || tfail "second library call is served from the caches: $(cat "$DZ_LOG")"
@@ -179,6 +180,9 @@ if want library; then
   "$B" bookmark add 'https://youtu.be/NEWWWWWWWW1' >/dev/null && [[ $(jq -r '.[2].title' "$XDG_CONFIG_HOME/omarchy-daily-zen/bookmarks.json") == "Fetched title" ]] && tok || tfail "bookmark an unknown video asks yt-dlp for its title"
   "$B" bookmark add LOFI1111111 >/dev/null; (( $(jq length "$XDG_CONFIG_HOME/omarchy-daily-zen/bookmarks.json") == 3 )) && tok || tfail "no duplicates"
   out=$("$B" library --json --bookmarks); [[ $(j .kind "$out") == bookmarks && $(j '.entries|length' "$out") == 3 && $(j '.entries[0].playing' "$out") == true && $(j '.now.id' "$out") == vFJuk4U-V7Q ]] && tok || tfail "library --bookmarks + now: $(j '{kind, n: (.entries|length), now: .now.id}' "$out")"
+  lofi=$(j '.entries[] | select(.id == "LOFI1111111")' "$out")
+  [[ $(j .views "$lofi") == 0 && $(j .viewers "$lofi") == 20000 && $(j .live "$lofi") == true && $(j '.entries[0].views' "$out") == 500000 ]] && tok || tfail "bookmarks keep views/viewers/live from the catalog: $lofi"
+  [[ $(j '.categories[0].bookmarked' "$out") == 1 && $(j '.categories[1].bookmarked' "$out") == 1 && $(j '.channels[0].bookmarked' "$out") == 1 ]] && tok || tfail "bookmark counts per category and creator: $(j '[.categories[].bookmarked, .channels[].bookmarked]' "$out")"
   "$B" bookmark toggle LOFI1111111 >/dev/null; (( $(jq length "$XDG_CONFIG_HOME/omarchy-daily-zen/bookmarks.json") == 2 )) && tok || tfail "toggle removes"
   "$B" bookmark remove vFJuk4U-V7Q >/dev/null; (( $(jq length "$XDG_CONFIG_HOME/omarchy-daily-zen/bookmarks.json") == 1 )) && tok || tfail "remove"
   ! "$B" bookmark add 'https://evil.example/x' >/dev/null 2>&1 && tok || tfail "bookmark rejects non-video"
@@ -214,6 +218,12 @@ if want library; then
   # play
   reset; : >"$DZ_LOG"
   "$B" play LOFI1111111 >/dev/null 2>&1 && [[ $(jq -r .url "$XDG_CONFIG_HOME/omarchy-daily-zen/config.json") == https://www.youtube.com/watch?v=LOFI1111111 ]] && tok || tfail "play a catalog entry"
+  (( $(grep -c 'play-body POST' "$DZ_LOG") == 1 )) && grep -q '"video_id":"vFJuk4U-V7Q"' <(grep play-body "$DZ_LOG") && tok || tfail "play reports one play for the resolved video: $(grep play-body "$DZ_LOG")"
+  : >"$DZ_LOG"; "$B" resolve --force >/dev/null; ! grep -q play-body "$DZ_LOG" && tok || tfail "resolve never reports plays"
+  : >"$DZ_LOG"; "$B" play LOFI1111111 >/dev/null 2>&1; ! grep -q play-body "$DZ_LOG" && tok || tfail "playing the same video again reports nothing (same id)"
+  cfgurl='https://www.youtube.com/watch?v=LOFI1111111'; out=$("$B" library --json --category lofi); [[ $(j '.entries[0].playing' "$out") == true ]] && tok || tfail "playing follows the configured url right away"
+  "$B" share-ratings off >/dev/null; : >"$DZ_LOG"; "$B" set-url 'https://youtu.be/vFJuk4U-V7Q' >/dev/null 2>&1; ! grep -q play-body "$DZ_LOG" && tok || tfail "share_ratings off: no play reported"
+  "$B" share-ratings on >/dev/null
   "$B" play AetherJourneyMusic >/dev/null 2>&1 && [[ $(jq -r .url "$XDG_CONFIG_HOME/omarchy-daily-zen/config.json") == https://www.youtube.com/@AetherJourneyMusic ]] && tok || tfail "play a creator = follow its newest"
   : >"$DZ_LOG"; DZ_FAIL=1 DZ_FAIL_MATCH='v=LIVEzzzzzzz' "$B" play LIVEzzzzzzz >/dev/null 2>&1 && [[ $(jq -r .url "$XDG_CONFIG_HOME/omarchy-daily-zen/config.json") == https://www.youtube.com/@ZenFM ]] && tok || tfail "a gone live entry falls back to its channel: $(jq -r .url "$XDG_CONFIG_HOME/omarchy-daily-zen/config.json")"
   ! "$B" play 'https://evil.example/v' >/dev/null 2>&1 && tok || tfail "play rejects other hosts"
@@ -242,6 +252,10 @@ if want api; then
     [[ $(/usr/bin/curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data '{"install_id":"nope","video_id":"vFJuk4U-V7Q","stars":4}' $A/v1/rate) == 400 ]] && tok || tfail "bad install id -> 400"
     [[ $(/usr/bin/curl -s -o /dev/null -w '%{http_code}' -X POST -H 'content-type: application/json' --data "{\"install_id\":\"$iid\",\"video_id\":\"vFJuk4U-V7Q\",\"stars\":9}" $A/v1/rate) == 400 ]] && tok || tfail "stars 9 -> 400"
     out=$(/usr/bin/curl -fsS -X DELETE -H 'content-type: application/json' --data "{\"install_id\":\"$iid\",\"video_id\":\"vFJuk4U-V7Q\"}" $A/v1/rate); [[ $(j .count "$out") == $((n1 - 1)) ]] && tok || tfail "DELETE removes: $out"
+    p0=$(/usr/bin/curl -fsS $A/v1/ratings | jq -r '."PLAYtest001".plays // 0')
+    out=$(/usr/bin/curl -fsS -X POST -H 'content-type: application/json' --data "{\"install_id\":\"$iid\",\"video_id\":\"PLAYtest001\"}" $A/v1/play); [[ $(j .plays "$out") == $((p0 + 1)) ]] && tok || tfail "POST play: $out"
+    out=$(/usr/bin/curl -fsS -X POST -H 'content-type: application/json' --data "{\"install_id\":\"$iid\",\"video_id\":\"PLAYtest001\"}" $A/v1/play); [[ $(j .plays "$out") == $((p0 + 1)) ]] && tok || tfail "same install, same day: not counted twice: $out"
+    out=$(/usr/bin/curl -fsS $A/v1/ratings); [[ $(j '."PLAYtest001".plays' "$out") == $((p0 + 1)) && $(j '."PLAYtest001".count' "$out") == 0 ]] && tok || tfail "listing carries plays for unrated videos: $(j '."PLAYtest001"' "$out")"
     # the CLI end to end against the real worker
     reset; out=$(OMARCHY_DAILY_ZEN_RATINGS_API=$A "$B" rate LOFI1111111 5); DZ_SKIP=1
     [[ $(jq -r '."LOFI1111111".synced' "$XDG_CONFIG_HOME/omarchy-daily-zen/ratings.json") == true ]] || tfail "CLI against the worker (curl stub is on PATH, so this needs DZ_TEST_STUBS unset)"

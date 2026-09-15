@@ -17,5 +17,9 @@ case "$url" in
     [[ $data == @- ]] && data=$(cat)
     echo "rate-body $method $data" >>"${DZ_LOG:-/dev/null}"
     jq -c '{video_id, avg: 4.5, count: 3}' <<<"$data" ;;
+  */v1/play)
+    [[ $data == @- ]] && data=$(cat)
+    echo "play-body $method $data" >>"${DZ_LOG:-/dev/null}"
+    jq -c '{video_id, plays: 7}' <<<"$data" ;;
   *) exit 22 ;;
 esac

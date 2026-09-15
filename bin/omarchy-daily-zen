@@ -29,6 +29,7 @@
 #   omarchy-daily-zen play ID|URL              play a library entry (a video id, a video URL or a creator's channel)
 #   omarchy-daily-zen bookmark [list|add [ID|URL]|remove ID|toggle [ID]]   bookmarks (no id = what is playing)
 #   omarchy-daily-zen rate ID|URL 1..5         rate a video (0 removes); shared with every install unless share_ratings is off
+#   omarchy-daily-zen share-ratings on|off     share your stars and plays (one per video and day) with every install
 #   omarchy-daily-zen ratings [--refresh]      everyone's averages (cached an hour)
 #   omarchy-daily-zen channel [list|add URL|remove ID|videos ID [--refresh]]   creators to follow
 #   omarchy-daily-zen catalog [--refresh]      the curated list (fetched from the main branch once a day)
@@ -326,13 +327,15 @@ cmd_theme() {
 
 # ---- daily -------------------------------------------------------------------
 cmd_daily() {
-  local force=0 a last frame after
+  local force=0 a last frame before after
   for a in "$@"; do case "$a" in --force) force=1 ;; *) die "daily: unknown option $a" ;; esac; done
   if (( ! force )) && [[ $(cfg daily_refresh) != true ]]; then echo "daily refresh is off"; return 0; fi
   last=$(jq -r '.last // 0' "$DAILY_STATE" 2>/dev/null || echo 0); [[ $last =~ ^[0-9]+$ ]] || last=0
   if (( ! force )) && (( $(now) - last < 86400 )); then echo "already refreshed today"; return 0; fi
+  before=$(jq -r '.video_id // ""' "$STREAM" 2>/dev/null || true)
   cmd_resolve --force --quiet
   after=$(jq -r '.video_id // ""' "$STREAM")
+  [[ -n $after && $after != "$before" ]] && report_play "$after"
   frame=$(cmd_still --quiet; jq -r .path "$FRAME_STATE")
   if [[ $(cfg daily_theme) == true ]]; then cmd_theme --frame "$frame" >/dev/null; fi
   jq -n --argjson last "$(now)" --arg frame "$frame" --arg id "$after" '{last: $last, frame: $frame, video_id: $id}' | write_json "$DAILY_STATE"
@@ -370,10 +373,15 @@ cmd_set_url() {
   local url=${1:-}
   [[ -n $url ]] || die "set-url wants a URL"
   valid_url "$url" || die "only https YouTube links (youtube.com, youtu.be, music.youtube.com) are accepted"
+  local before after
+  before=$(jq -r '.video_id // ""' "$STREAM" 2>/dev/null || true)
   config_set url "$(jq -n --arg u "$url" '$u')"
   rm -f "$STREAM" "$POSITION_STATE"
   ipc reload
   cmd_resolve --quiet && cmd_resolve
+  after=$(jq -r '.video_id // ""' "$STREAM" 2>/dev/null || true)
+  [[ -n $after && $after != "$before" ]] && report_play "$after"
+  return 0
 }
 
 SUNO_INVITE="https://suno.com/invite/@markusix"
@@ -479,7 +487,8 @@ now_entry() {
 }
 ANNOTATE_JQ='def annotate($m; $c; $b; $now): (.id // "") as $vid | . + {
   bookmarked: (($b | index([$vid])) != null), my_stars: ($m[$vid].stars // 0),
-  avg: ($c[$vid].avg // 0), count: ($c[$vid].count // 0), playing: ($vid == $now) };'
+  avg: ($c[$vid].avg // 0), count: ($c[$vid].count // 0), plays: ($c[$vid].plays // 0),
+  views: (.views // 0), viewers: (.viewers // 0), playing: ($vid == $now) };'
 
 cmd_catalog() {
   local refresh=0 json=0 a f
@@ -489,7 +498,7 @@ cmd_catalog() {
 }
 
 cmd_bookmark() {
-  local sub=${1:-list} id title channel url entry ref
+  local sub=${1:-list} id title channel url entry ref extra='{}'
   shift || true
   case "$sub" in
     list)
@@ -507,16 +516,19 @@ cmd_bookmark() {
       fi
       if [[ -z $ref ]]; then
         title=$(jq -r .title "$STREAM"); channel=$(jq -r .channel "$STREAM"); url=$(jq -r .webpage_url "$STREAM")
+        extra=$(jq -c '{live: (.is_live // false)}' "$STREAM")
+        if entry=$(find_entry "$id"); then extra=$(jq -c '{views: (.views // 0), viewers: (.viewers // 0), live: (.live // false), channel_url: (.channel_url // "")}' <<<"$entry"); fi
       elif entry=$(find_entry "$id"); then
         title=$(jq -r .title <<<"$entry"); channel=$(jq -r .channel <<<"$entry"); url=$(jq -r .url <<<"$entry")
+        extra=$(jq -c '{views: (.views // 0), viewers: (.viewers // 0), live: (.live // false), channel_url: (.channel_url // "")}' <<<"$entry")
       else
         url="https://www.youtube.com/watch?v=$id"
         IFS=$'\t' read -r title channel < <(yt-dlp --no-warnings --skip-download --no-playlist --print '%(title)s\t%(channel)s' -- "$url" 2>/dev/null | head -n1 || true)
         [[ -n $title ]] || title=$id
       fi
       [[ -n $url && $url != null ]] || url="https://www.youtube.com/watch?v=$id"
-      bookmarks_json | jq --arg id "$id" --arg t "$title" --arg c "${channel:-}" --arg u "$url" --argjson at "$(now)" \
-        '[.[] | select(.id != $id)] + [{id: $id, title: $t, channel: $c, url: $u, added: $at}]' | write_json "$BOOKMARKS"
+      bookmarks_json | jq --arg id "$id" --arg t "$title" --arg c "${channel:-}" --arg u "$url" --argjson at "$(now)" --argjson x "$extra" \
+        '[.[] | select(.id != $id)] + [({id: $id, title: $t, channel: $c, url: $u, added: $at} + $x)]' | write_json "$BOOKMARKS"
       echo "bookmarked $id" ;;
     remove)
       id=$(video_id_of "${1:-}") || die "remove wants a video id or URL"
@@ -543,6 +555,17 @@ sync_rating() {
     mkdir -p "$CACHE_DIR"
     json_file_or "$RATINGS_CACHE" 'type == "object"' '{}' | jq --argjson r "$out" '.[$r.video_id] = {avg: $r.avg, count: $r.count}' | write_json "$RATINGS_CACHE"
   fi
+}
+# One "play" per install, video and day, when the stream changes to another
+# video (the API ignores repeats). Same opt-out as the stars.
+report_play() {
+  local id=$1 api iid
+  (LC_ALL=C; [[ $id =~ ^[A-Za-z0-9_-]{11}$ ]]) || return 0
+  [[ $(cfg share_ratings) == true ]] || return 0
+  api=$(ratings_api) || return 0
+  iid=$(install_id)
+  jq -nc --arg i "$iid" --arg v "$id" '{install_id: $i, video_id: $v}' \
+    | curl -fsS --max-time 4 -A "omarchy-daily-zen/$VERSION" -X POST -H 'content-type: application/json' --data @- "$api/v1/play" >/dev/null 2>&1 || true
 }
 sync_pending() {
   local id stars
@@ -641,7 +664,9 @@ cmd_library() {
     esac; shift
   done
   f=$(catalog_file "$refresh"); community=$(community_ratings "$refresh"); mine=$(my_ratings_json); bm=$(bookmarks_json)
-  now=$(jq -r '.video_id // ""' "$STREAM" 2>/dev/null || true)
+  # What is playing: the configured video right away (set-url writes it before
+  # the resolve finishes), the resolved stream for channel and playlist URLs.
+  now=$(video_id_of "$(cfg url)" 2>/dev/null) || now=$(jq -r '.video_id // ""' "$STREAM" 2>/dev/null || true)
   chans=$(channels_json)
   if (( bookmarks )); then entries=$bm; kind=bookmarks
   elif [[ -n $channel ]]; then entries=$(channel_videos "$channel" "$refresh"); kind=channel
@@ -653,11 +678,13 @@ cmd_library() {
   local out
   out=$(jq -n --argjson entries "$entries" --argjson bm "$bm" --argjson mine "$mine" --argjson community "$community" --argjson chans "$chans" \
     --argjson nowe "$(now_entry)" --arg now "$now" --arg kind "$kind" --arg category "$category" --arg channel "$channel" --argjson api "$api_ok" \
-    --argjson cats "$(jq -c '[.categories[] | {id, name, count: (.entries | length)}]' "$f")" --arg generated "$(jq -r '.generated // ""' "$f")" \
+    --argjson cats "$(jq -c --argjson bm "$bm" '($bm | map(.id)) as $bids | [.categories[] | {id, name, count: (.entries | length),
+        bookmarked: ([.entries[] | (.id // "") as $i | select(($bids | index([$i])) != null)] | length)}]' "$f")" --arg generated "$(jq -r '.generated // ""' "$f")" \
     "$ANNOTATE_JQ"'
     ($bm | map(.id)) as $bids
     | { generated: $generated, ratings_api_available: $api, kind: $kind, category: $category, channel: $channel,
-        categories: $cats, channels: $chans,
+        categories: $cats,
+        channels: ($chans | map(. as $ch | . + {bookmarked: ([$bm[] | select((.channel_url // "") != "" and ((.channel_url // "") == $ch.url or (.channel // "") == $ch.name))] | length)})),
         now: (if $nowe then ($nowe | annotate($mine; $community; $bids; $now)) else null end),
         bookmarks: ($bm | map(annotate($mine; $community; $bids; $now))),
         entries: ($entries | map(annotate($mine; $community; $bids; $now))) }')

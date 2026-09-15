@@ -45,9 +45,11 @@ Panel {
   readonly property var browseOptions: {
     var opts = [{ value: "bookmarks", label: "Bookmarks" + (lib && lib.bookmarks ? " (" + lib.bookmarks.length + ")" : "") }]
     var cats = lib && lib.categories ? lib.categories : [{ id: "zen", name: "Zen" }]
-    for (var i = 0; i < cats.length; i++) opts.push({ value: "cat:" + cats[i].id, label: cats[i].name })
+    for (var i = 0; i < cats.length; i++)
+      opts.push({ value: "cat:" + cats[i].id, label: cats[i].name + (cats[i].bookmarked ? "  ·  " + cats[i].bookmarked + " bookmarked" : "") })
     var chans = lib && lib.channels ? lib.channels : [{ id: "AetherJourneyMusic", name: "Aether Journey" }]
-    for (var k = 0; k < chans.length; k++) opts.push({ value: "ch:" + chans[k].id, label: "Creator: " + chans[k].name })
+    for (var k = 0; k < chans.length; k++)
+      opts.push({ value: "ch:" + chans[k].id, label: "Creator: " + chans[k].name + (chans[k].bookmarked ? "  ·  " + chans[k].bookmarked + " bookmarked" : "") })
     return opts
   }
   readonly property var browseChannel: {
@@ -137,7 +139,17 @@ Panel {
     }
   }
   Timer { interval: 3000; running: root.opened; repeat: true; onTriggered: root.load() }
-  Timer { interval: 60000; running: !root.opened; repeat: true; onTriggered: root.load() }
+  Timer { interval: 10000; running: !root.opened; repeat: true; onTriggered: root.load() }
+  // A new stream (from the popup, the command line or the daily refresh):
+  // reload the library so the playing row moves.
+  property string lastStreamId: ""
+  onStatusChanged: {
+    var id = root.stream && root.stream.video_id ? String(root.stream.video_id) : ""
+    if (id !== root.lastStreamId) { root.lastStreamId = id; if (root.opened) root.loadLibrary(false) }
+  }
+  // After Play the resolve takes a few seconds: look again three times.
+  Timer { id: playReload; interval: 2500; repeat: true; property int left: 0
+    onTriggered: { root.load(); root.loadLibrary(false); if (--left <= 0) stop() } }
   Timer { id: reloadSoon; interval: 900; onTriggered: { root.load(); root.loadLibrary(false) } }
 
   // ---- library (catalog, creators, bookmarks, ratings) ----
@@ -168,7 +180,17 @@ Panel {
     act(["channel", "add", u])
   }
 
-  function act(argv) { Util.execArgv([root.cli].concat(argv)); reloadSoon.restart() }
+  function act(argv) {
+    Util.execArgv([root.cli].concat(argv))
+    reloadSoon.restart()
+    if (argv[0] === "play" || argv[0] === "set-url" || argv[0] === "daily") { playReload.left = 3; playReload.restart() }
+  }
+  function fmtCount(n) {
+    n = Number(n || 0)
+    if (n >= 1000000) return (n / 1000000).toFixed(n >= 10000000 ? 0 : 1) + "M"
+    if (n >= 1000) return (n / 1000).toFixed(n >= 10000 ? 0 : 1) + "k"
+    return String(n)
+  }
   function setMode(m) { act(["mode", m]) }
   function useUrl() {
     var u = String(urlDraft || "").trim()
@@ -177,12 +199,12 @@ Panel {
     act(["set-url", u])
   }
 
+  // Media convention: pause while playing, play while paused or stopped; a
+  // picture for still, a dimmed picture for off.
   function modeIcon() {
-    if (!root.engineUp) return "󰋩"
-    if (root.engineState === "error") return "󰋩"
-    if (root.mode === "off") return "󰋩"
-    if (root.mode === "still") return "󰋩"
-    return root.engineState === "playing" ? "󰐊" : "󰏤"
+    if (!root.engineUp || root.mode === "off" || root.mode === "still") return "󰋩"
+    if (root.engineState === "playing") return "󰏤"
+    return "󰐊"
   }
   function stateText() {
     if (!root.status) return root.error ? root.error : "Loading…"
@@ -217,7 +239,7 @@ Panel {
     fontSize: Style.font.caption
     tooltipText: "Daily Zen Wallpaper"
       + (root.stream && root.stream.title ? " · " + root.stream.title : "")
-      + " — " + root.stateText()
+      + " — " + root.stateText() + " · middle-click: animated / still, scroll: volume"
       + (root.updateAvailable ? " · " + root.updateInfo.latest + " is available" : (root.updateMismatch ? " · finish updating" : ""))
     onPressed: function(mouseButton) {
       if (mouseButton === Qt.MiddleButton) root.setMode(root.mode === "animated" ? "still" : "animated")
@@ -481,7 +503,7 @@ Panel {
               : (root.browse === "bookmarks" ? "Your bookmarks. Bookmark anything with the flag on its row."
                 : (root.browseChannel ? "Latest from " + root.browseChannel.name + " (live streams first). Play the creator to follow their newest upload every day."
                   : "The ten most popular long streams in this category, from YouTube searches (catalog " + (root.lib.generated || "") + ")."))
-              + (root.lib && root.lib.ratings_api_available ? " Stars are shared with every install." : " Community ratings are not available yet; your stars stay on this machine until then.")
+              + (root.lib && root.lib.ratings_api_available ? " Stars and plays are shared with every install." : " Community stars and play counts are not available yet; your stars stay on this machine until then.")
           }
           Flow {
             width: parent.width
@@ -531,6 +553,9 @@ Panel {
                   elide: Text.ElideRight; textFormat: Text.PlainText
                   color: root.dim; font.family: root.fontFamily; font.pixelSize: Style.font.caption
                   text: (erow.modelData.channel || "") + (erow.modelData.live ? " · live" : "")
+                    + (erow.modelData.live && erow.modelData.viewers > 0 ? " · ~" + root.fmtCount(erow.modelData.viewers) + " watching" : "")
+                    + (!erow.modelData.live && erow.modelData.views > 0 ? " · " + root.fmtCount(erow.modelData.views) + " YouTube views" : "")
+                    + (root.lib && root.lib.ratings_api_available ? " · " + root.fmtCount(erow.modelData.plays || 0) + " Zen play" + (erow.modelData.plays === 1 ? "" : "s") : "")
                     + (erow.modelData.count > 0 ? " · " + Number(erow.modelData.avg).toFixed(1) + " ★ (" + erow.modelData.count + ")" : "")
                 }
                 Row {

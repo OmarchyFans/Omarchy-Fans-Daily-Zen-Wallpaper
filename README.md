@@ -25,7 +25,8 @@ upload, checked every day).
   and the palette follows the picture every day.
 - **Bar chip.** Left click opens the popup (mode, sound, volume, quality, the
   stream URL, daily options). Middle click flips animated and still. Scroll
-  changes the volume.
+  changes the volume. The icon is a pause sign while the stream plays and a
+  play sign while it is paused, a picture in still mode.
 - **Stays out of the way.** Video decoding pauses while a fullscreen window
   covers the wallpaper (the music keeps playing); the video is capped at 720p
   by default (480p and 1080p are a click away).
@@ -37,9 +38,12 @@ upload, checked every day).
 - **Creators.** Follow YouTube channels (Aether Journey is in from the start):
   the selector lists a creator's latest streams and uploads, and *Play this
   creator* makes their newest upload the wallpaper, rechecked every day.
-- **Bookmarks and ratings.** Flag any entry, give it one to five stars. Stars
-  are shared with every install through a small ratings API, so each row shows
-  everyone's average. `share_ratings: false` keeps yours on this machine.
+- **Bookmarks, ratings and play counts.** Flag any entry, give it one to five
+  stars. Stars and plays (one per install and day) are shared with every
+  install through a small API, so each row shows everyone's average, how many
+  installs played it, and the YouTube views or live viewers as of the catalog
+  build. The selector counts your bookmarks per category and per creator.
+  `omarchy-daily-zen share-ratings off` keeps stars and plays on this machine.
 - **Picks up where it left off.** The engine saves the playback position every
   30 seconds; after a shell restart or a reboot the same video resumes there.
 - **Update alerts.** The popup tells you when a newer version is published and
@@ -140,9 +144,11 @@ other file from its own templates.
   main branch on GitHub.
 - A rating sends three things to the ratings API named in the catalog: a
   random install id made on first use (no account, no name), the video id and
-  the stars. Averages are fetched once an hour. `omarchy-daily-zen share-ratings
-  off` keeps ratings local. The API (`api/`) stores only those rows and counts
-  requests per IP for a minute to cap writes.
+  the stars. Switching to another video sends the install id and the video id
+  once (the API counts one play per install, video and day). Averages and
+  play counts are fetched once an hour. `omarchy-daily-zen share-ratings off`
+  keeps both local. The API (`api/`) stores only those rows and counts
+  requests per IP for a minute to cap writes; no names, accounts or IPs.
 - The Suno link at the top of the popup opens the author's invite page in your
   browser only when you click it.
 - Once every six hours the update check fetches this plugin's `manifest.json`
@@ -163,7 +169,8 @@ hand: `omarchy plugin update fans.omarchy.daily-zen-wallpaper`, then
 
 ## Ratings API
 
-`api/worker.js` is a Cloudflare Worker over D1 (`api/schema.sql`). Deployed by
+`api/worker.js` is a Cloudflare Worker over D1 (`api/schema.sql`: `ratings`,
+`plays`, a per-IP minute counter). Deployed by
 `.github/workflows/deploy-api.yml` once the repository has the secrets
 `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the workflow creates the
 database on first run. The worker URL goes into `catalog.json` as
