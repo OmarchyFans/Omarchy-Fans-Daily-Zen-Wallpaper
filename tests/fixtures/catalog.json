@@ -1,0 +1,9 @@
+{"schema": 1, "generated": "2026-09-15", "ratings_api": "https://ratings.test",
+ "channels": [{"id": "AetherJourneyMusic", "name": "Aether Journey", "url": "https://www.youtube.com/@AetherJourneyMusic"}],
+ "categories": [
+  {"id": "zen", "name": "Zen", "entries": [
+    {"id": "vFJuk4U-V7Q", "title": "KUMAMICHI", "channel": "Aether Journey", "channel_url": "https://www.youtube.com/@AetherJourneyMusic", "url": "https://www.youtube.com/watch?v=vFJuk4U-V7Q", "live": false, "duration": 20817, "views": 500000, "viewers": 0},
+    {"id": "LIVEzzzzzzz", "title": "Zen radio", "channel": "Zen FM", "channel_url": "https://www.youtube.com/@ZenFM", "url": "https://www.youtube.com/watch?v=LIVEzzzzzzz", "live": true, "duration": 0, "views": 0, "viewers": 300}]},
+  {"id": "lofi", "name": "Lofi", "entries": [
+    {"id": "LOFI1111111", "title": "lofi radio", "channel": "Lofi Girl", "channel_url": "https://www.youtube.com/@LofiGirl", "url": "https://www.youtube.com/watch?v=LOFI1111111", "live": true, "duration": 0, "views": 0, "viewers": 20000}]}
+ ]}

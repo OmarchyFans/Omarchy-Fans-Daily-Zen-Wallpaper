@@ -2,8 +2,16 @@
 # test stub: answers from $DZ_FIXTURE (a yt-dlp -j document); records argv in $DZ_LOG
 echo "yt-dlp $*" >>"${DZ_LOG:-/dev/null}"
 args=("$@")
+url=${args[-1]}
 if [[ " $* " == *" --flat-playlist "* ]]; then
-  url=${args[-1]}
+  if [[ " $* " == *" -j "* ]]; then
+    case "$url" in
+      */streams) printf '%s\n' '{"id":"LIVEaaaaaaa","title":"Zen live","channel":"Aether Journey","channel_url":"https://www.youtube.com/@AetherJourneyMusic","live_status":"is_live","concurrent_view_count":42}' ;;
+      */videos) printf '%s\n' '{"id":"VIDbbbbbbbb","title":"Zen video one","channel":"Aether Journey","channel_url":"https://www.youtube.com/@AetherJourneyMusic","duration":7200,"view_count":1000}' '{"id":"VIDccccccc1","title":"Upcoming","live_status":"is_upcoming"}' ;;
+    esac
+    exit 0
+  fi
+  if [[ " $* " == *" --print channel "* ]]; then echo "Stub Creator"; exit 0; fi
   case "$url" in
     *"/streams") [[ -n ${DZ_STREAMS_EMPTY:-} ]] && exit 1; echo "STREAM01xyz" ;;
     *"/videos") echo "VIDEO01abcd" ;;
@@ -12,5 +20,6 @@ if [[ " $* " == *" --flat-playlist "* ]]; then
   esac
   exit 0
 fi
-[[ -n ${DZ_FAIL:-} ]] && { echo "ERROR: [youtube] boom" >&2; exit 1; }
+if [[ " $* " == *" --print "* ]]; then printf 'Fetched title\tFetched channel\n'; exit 0; fi
+if [[ -n ${DZ_FAIL:-} ]] && [[ -z ${DZ_FAIL_MATCH:-} || $url == *"$DZ_FAIL_MATCH"* ]]; then echo "ERROR: [youtube] boom" >&2; exit 1; fi
 cat "${DZ_FIXTURE:?}"

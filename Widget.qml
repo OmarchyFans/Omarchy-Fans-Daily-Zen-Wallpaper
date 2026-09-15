@@ -27,6 +27,9 @@ Panel {
   readonly property string fontFamily: bar ? bar.fontFamily : Style.font.family
 
   property var status: null
+  property var lib: null
+  property string browse: "cat:zen"        // bookmarks | cat:<id> | ch:<id>
+  property string followDraft: ""
   property bool loading: false
   property string error: ""
   property string urlDraft: ""
@@ -39,6 +42,26 @@ Panel {
   readonly property bool sound: cfg.sound !== false
   readonly property real volume: typeof cfg.volume === "number" ? cfg.volume : 0.35
   readonly property bool engineUp: engine !== null
+  readonly property var browseOptions: {
+    var opts = [{ value: "bookmarks", label: "Bookmarks" + (lib && lib.bookmarks ? " (" + lib.bookmarks.length + ")" : "") }]
+    var cats = lib && lib.categories ? lib.categories : [{ id: "zen", name: "Zen" }]
+    for (var i = 0; i < cats.length; i++) opts.push({ value: "cat:" + cats[i].id, label: cats[i].name })
+    var chans = lib && lib.channels ? lib.channels : [{ id: "AetherJourneyMusic", name: "Aether Journey" }]
+    for (var k = 0; k < chans.length; k++) opts.push({ value: "ch:" + chans[k].id, label: "Creator: " + chans[k].name })
+    return opts
+  }
+  readonly property var browseChannel: {
+    if (!lib || browse.indexOf("ch:") !== 0) return null
+    var id = browse.substring(3)
+    for (var i = 0; i < (lib.channels || []).length; i++) if (lib.channels[i].id === id) return lib.channels[i]
+    return null
+  }
+  readonly property var libRows: {
+    if (!lib) return []
+    var rows = lib.entries || []
+    if (lib.now && lib.now.id && !rows.some(function(e) { return e.id === lib.now.id })) rows = [Object.assign({}, lib.now, { isNow: true })].concat(rows)
+    return rows
+  }
   readonly property string engineState: engine ? String(engine.state || "") : ""
 
   // updates: what `update-check` reported for this widget's version (docs/update-alerts.md)
@@ -54,7 +77,7 @@ Panel {
   implicitWidth: button.implicitWidth
   implicitHeight: button.implicitHeight
 
-  onOpenedChanged: if (opened) { load(); checkUpdates() }
+  onOpenedChanged: if (opened) { load(); loadLibrary(false); checkUpdates() }
   Component.onCompleted: load()
 
   // ---- updates ----------------------------------------------------------------
@@ -115,7 +138,35 @@ Panel {
   }
   Timer { interval: 3000; running: root.opened; repeat: true; onTriggered: root.load() }
   Timer { interval: 60000; running: !root.opened; repeat: true; onTriggered: root.load() }
-  Timer { id: reloadSoon; interval: 900; onTriggered: root.load() }
+  Timer { id: reloadSoon; interval: 900; onTriggered: { root.load(); root.loadLibrary(false) } }
+
+  // ---- library (catalog, creators, bookmarks, ratings) ----
+  function loadLibrary(refresh) {
+    if (libProc.running) { libAgain.restart(); return }
+    var argv = [root.cli, "library", "--json"]
+    if (root.browse === "bookmarks") argv.push("--bookmarks")
+    else if (root.browse.indexOf("ch:") === 0) argv.push("--channel", root.browse.substring(3))
+    else argv.push("--category", root.browse.substring(4))
+    if (refresh) argv.push("--refresh")
+    libProc.command = argv
+    libProc.running = true
+  }
+  Timer { id: libAgain; interval: 400; onTriggered: root.loadLibrary(false) }
+  Process {
+    id: libProc
+    stdout: StdioCollector { id: libOut; waitForEnd: true }
+    stderr: StdioCollector { id: libErr; waitForEnd: true }
+    onExited: function(code) {
+      if (code !== 0) { root.error = String(libErr.text || "").trim() || ("library exited " + code); return }
+      try { root.lib = JSON.parse(libOut.text) } catch (e) { root.error = "bad JSON from library" }
+    }
+  }
+  function follow() {
+    var u = String(followDraft || "").trim()
+    if (!u) return
+    root.followDraft = ""
+    act(["channel", "add", u])
+  }
 
   function act(argv) { Util.execArgv([root.cli].concat(argv)); reloadSoon.restart() }
   function setMode(m) { act(["mode", m]) }
@@ -218,6 +269,14 @@ Panel {
           id: column
           width: flick.width
           spacing: Style.space(8)
+
+          // The author's Suno invite: make your own music (opens the browser).
+          Button {
+            text: "Make your own music with Suno"; iconText: "󰝚"; foreground: Color.accent; fontFamily: root.fontFamily
+            fontSize: Style.font.caption; iconSize: Style.font.caption
+            tooltipText: "suno.com/invite/@markusix — the author's invite link"
+            onClicked: { root.close(); Util.execArgv([root.cli, "suno"]) }
+          }
 
           PanelHero {
             width: parent.width
@@ -386,6 +445,152 @@ Panel {
             color: root.dim; font.family: root.fontFamily; font.pixelSize: Style.font.caption
             text: (root.status && root.status.frame ? "Last still " + root.ago(root.status.frame.taken) : "No still yet")
               + (root.status && root.status.daily ? " · daily refresh " + root.ago(root.status.daily.last) : "")
+          }
+
+          // ---- library ----
+          PanelSeparator { width: parent.width }
+          Row {
+            width: parent.width
+            spacing: Style.space(8)
+            PanelSectionHeader { anchors.verticalCenter: parent.verticalCenter; text: "Library" }
+            Dropdown {
+              id: browseDropdown
+              width: Style.space(230)
+              anchors.verticalCenter: parent.verticalCenter
+              showLabel: false
+              options: root.browseOptions
+              fontFamily: root.fontFamily
+              Connections {
+                target: root
+                function onBrowseOptionsChanged() { if (browseDropdown.value !== root.browse) browseDropdown.value = root.browse }
+              }
+              Component.onCompleted: value = root.browse
+              onChanged: function(v) { if (v !== root.browse) { root.browse = v; root.loadLibrary(false) } }
+            }
+            Button {
+              anchors.verticalCenter: parent.verticalCenter
+              text: ""; iconText: "󰑐"; foreground: root.dim; fontFamily: root.fontFamily
+              tooltipText: "Fetch the newest catalog, creator lists and community ratings"
+              onClicked: root.loadLibrary(true)
+            }
+          }
+          Text {
+            width: parent.width; wrapMode: Text.WordWrap; textFormat: Text.PlainText
+            color: root.dim; font.family: root.fontFamily; font.pixelSize: Style.font.caption
+            text: !root.lib ? "Loading the library…"
+              : (root.browse === "bookmarks" ? "Your bookmarks. Bookmark anything with the flag on its row."
+                : (root.browseChannel ? "Latest from " + root.browseChannel.name + " (live streams first). Play the creator to follow their newest upload every day."
+                  : "The ten most popular long streams in this category, from YouTube searches (catalog " + (root.lib.generated || "") + ")."))
+              + (root.lib && root.lib.ratings_api_available ? " Stars are shared with every install." : " Community ratings are not available yet; your stars stay on this machine until then.")
+          }
+          Flow {
+            width: parent.width
+            spacing: Style.space(6)
+            visible: root.browseChannel !== null
+            Button {
+              text: "Play this creator"; iconText: "󰐊"; foreground: Color.accent; fontFamily: root.fontFamily
+              tooltipText: "Follow: their newest stream or upload becomes the wallpaper, rechecked every day"
+              onClicked: if (root.browseChannel) root.act(["play", root.browseChannel.id])
+            }
+            Button {
+              visible: !!(root.browseChannel && root.browseChannel.added)
+              text: "Unfollow"; foreground: root.dim; fontFamily: root.fontFamily
+              onClicked: { var id = root.browseChannel.id; root.browse = "cat:zen"; root.act(["channel", "remove", id]) }
+            }
+          }
+          Repeater {
+            model: root.libRows
+            delegate: Column {
+              id: erow
+              required property var modelData
+              width: column.width
+              spacing: Style.space(2)
+              Row {
+                width: parent.width
+                spacing: Style.space(6)
+                Text {
+                  width: parent.width - playBtn.width - parent.spacing
+                  anchors.verticalCenter: parent.verticalCenter
+                  elide: Text.ElideRight; textFormat: Text.PlainText
+                  color: erow.modelData.playing ? Color.accent : root.foreground; font.family: root.fontFamily; font.pixelSize: Style.font.body
+                  text: (erow.modelData.isNow ? "Now playing: " : "") + (erow.modelData.title || erow.modelData.id)
+                }
+                Button {
+                  id: playBtn
+                  text: erow.modelData.playing ? "Playing" : "Play"; iconText: "󰐊"; fontFamily: root.fontFamily
+                  foreground: erow.modelData.playing ? root.dim : Color.accent
+                  onClicked: if (!erow.modelData.playing) root.act(["play", String(erow.modelData.id)])
+                }
+              }
+              Row {
+                width: parent.width
+                spacing: Style.space(8)
+                Text {
+                  width: parent.width - starRow.width - bmBtn.width - parent.spacing * 2
+                  anchors.verticalCenter: parent.verticalCenter
+                  elide: Text.ElideRight; textFormat: Text.PlainText
+                  color: root.dim; font.family: root.fontFamily; font.pixelSize: Style.font.caption
+                  text: (erow.modelData.channel || "") + (erow.modelData.live ? " · live" : "")
+                    + (erow.modelData.count > 0 ? " · " + Number(erow.modelData.avg).toFixed(1) + " ★ (" + erow.modelData.count + ")" : "")
+                }
+                Row {
+                  id: starRow
+                  anchors.verticalCenter: parent.verticalCenter
+                  spacing: Style.space(1)
+                  Repeater {
+                    model: 5
+                    delegate: Text {
+                      required property int index
+                      textFormat: Text.PlainText
+                      text: index < (erow.modelData.my_stars || 0) ? "★" : "☆"
+                      color: index < (erow.modelData.my_stars || 0) ? Color.accent : root.dim
+                      font.family: root.fontFamily; font.pixelSize: Style.font.body
+                      MouseArea {
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.act(["rate", String(erow.modelData.id), String((erow.modelData.my_stars || 0) === index + 1 ? 0 : index + 1)])
+                      }
+                    }
+                  }
+                }
+                Button {
+                  id: bmBtn
+                  anchors.verticalCenter: parent.verticalCenter
+                  text: ""; iconText: erow.modelData.bookmarked ? "󰃀" : "󰃃"; fontFamily: root.fontFamily
+                  foreground: erow.modelData.bookmarked ? Color.accent : root.dim
+                  tooltipText: erow.modelData.bookmarked ? "Remove the bookmark" : "Bookmark"
+                  onClicked: root.act(["bookmark", "toggle", String(erow.modelData.id)])
+                }
+              }
+              PanelSeparator { width: parent.width; strength: 0.06 }
+            }
+          }
+          Text {
+            width: parent.width; wrapMode: Text.WordWrap; textFormat: Text.PlainText
+            visible: root.lib !== null && root.libRows.length === 0
+            color: root.dim; font.family: root.fontFamily; font.pixelSize: Style.font.caption
+            text: root.browse === "bookmarks" ? "No bookmarks yet." : "Nothing here yet."
+          }
+          Row {
+            width: parent.width
+            spacing: Style.space(6)
+            TextField {
+              id: followField
+              width: parent.width - followButton.width - parent.spacing
+              foreground: root.foreground
+              placeholderText: "Follow a creator: https://www.youtube.com/@channel"
+              font.family: root.fontFamily
+              text: root.followDraft
+              onTextEdited: root.followDraft = text
+              onAccepted: root.follow()
+            }
+            Button {
+              id: followButton
+              anchors.verticalCenter: parent.verticalCenter
+              text: "Follow"; foreground: Color.accent; fontFamily: root.fontFamily
+              tooltipText: "Add this creator to the Library selector"
+              onClicked: root.follow()
+            }
           }
 
           // ---- stream ----

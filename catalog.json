@@ -1,0 +1,1293 @@
+{
+ "schema": 1,
+ "generated": "2026-09-15",
+ "ratings_api": "",
+ "channels": [
+  {
+   "id": "AetherJourneyMusic",
+   "name": "Aether Journey",
+   "url": "https://www.youtube.com/@AetherJourneyMusic",
+   "note": "Japanese zen music along the bear's path: the default stream"
+  }
+ ],
+ "categories": [
+  {
+   "id": "lofi",
+   "name": "Lofi",
+   "entries": [
+    {
+     "id": "rFZHOHl-L8A",
+     "title": "lofi hip hop radio 📚 beats to relax/study to",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=rFZHOHl-L8A",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 21206
+    },
+    {
+     "id": "4xDzrJKXOOY",
+     "title": "synthwave radio 🌌 beats to chill/game to",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=4xDzrJKXOOY",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 3029
+    },
+    {
+     "id": "E2vONfzoyRI",
+     "title": "jazz lofi radio 🎷 beats to chill/study to",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=E2vONfzoyRI",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 2260
+    },
+    {
+     "id": "7oHxpusmRfU",
+     "title": "🔴 Cozy Lofi Room Radio 🎧 Chill Lofi Beats to Study, Work & Relax",
+     "channel": "Lofi All Day",
+     "channel_url": "https://www.youtube.com/channel/UCPWhI_Wk3QI8q_QmMaKq3Ig",
+     "url": "https://www.youtube.com/watch?v=7oHxpusmRfU",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 1006
+    },
+    {
+     "id": "5yx6BWlEVcY",
+     "title": "Chillhop Radio - jazzy & lofi hip hop beats 🐾",
+     "channel": "Chillhop Music",
+     "channel_url": "https://www.youtube.com/channel/UCOxqgCwgOqC2lMqC5PYz_Dg",
+     "url": "https://www.youtube.com/watch?v=5yx6BWlEVcY",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 976
+    },
+    {
+     "id": "lTRiuFIWV54",
+     "title": "1 A.M Study Session 📚 [lofi hip hop]",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=lTRiuFIWV54",
+     "live": false,
+     "duration": 3674,
+     "views": 135913287,
+     "viewers": 0
+    },
+    {
+     "id": "-FlxM_0S2lA",
+     "title": "Best of lofi 2018 🎶 beats to chill/study to",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=-FlxM_0S2lA",
+     "live": false,
+     "duration": 6817,
+     "views": 57428080,
+     "viewers": 0
+    },
+    {
+     "id": "n61ULEU7CO0",
+     "title": "Best of lofi hip hop 2021 ✨ [beats to relax/study to]",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=n61ULEU7CO0",
+     "live": false,
+     "duration": 22258,
+     "views": 57312617,
+     "viewers": 0
+    },
+    {
+     "id": "gwDoRPcPxtc",
+     "title": "Chill Study Beats 2 • Instrumental & Jazz Hip Hop Music [2016]",
+     "channel": "Chillhop Music",
+     "channel_url": "https://www.youtube.com/channel/UCOxqgCwgOqC2lMqC5PYz_Dg",
+     "url": "https://www.youtube.com/watch?v=gwDoRPcPxtc",
+     "live": false,
+     "duration": 7249,
+     "views": 45748543,
+     "viewers": 0
+    },
+    {
+     "id": "CLeZyIID9Bo",
+     "title": "Chill Lofi Mix [chill lo-fi hip hop beats]",
+     "channel": "Settle",
+     "channel_url": "https://www.youtube.com/channel/UCkKT4qf-TcPFOmpqhTawrGA",
+     "url": "https://www.youtube.com/watch?v=CLeZyIID9Bo",
+     "live": false,
+     "duration": 6292,
+     "views": 34561869,
+     "viewers": 0
+    }
+   ]
+  },
+  {
+   "id": "work",
+   "name": "Work",
+   "entries": [
+    {
+     "id": "kj6vgffSGw4",
+     "title": "Music for Work — Limitless Productivity Radio",
+     "channel": "Chill Music Lab",
+     "channel_url": "https://www.youtube.com/channel/UCwVQIkAtyZzQSA-OY1rsGig",
+     "url": "https://www.youtube.com/watch?v=kj6vgffSGw4",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 115
+    },
+    {
+     "id": "giOUVe2_f7s",
+     "title": "Productivity Music for Work | Focus Music",
+     "channel": "Greenred Productions - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UC1bjWVLp2aaJmPcNbi9OOsw",
+     "url": "https://www.youtube.com/watch?v=giOUVe2_f7s",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 39
+    },
+    {
+     "id": "_4kHxtiuML0",
+     "title": "Focus Music for Work and Studying, Background Music for Concentration, Study Music",
+     "channel": "Greenred Productions - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UC1bjWVLp2aaJmPcNbi9OOsw",
+     "url": "https://www.youtube.com/watch?v=_4kHxtiuML0",
+     "live": false,
+     "duration": 32933,
+     "views": 83815023,
+     "viewers": 0
+    },
+    {
+     "id": "sjkrrmBnpGE",
+     "title": "Ambient Study Music To Concentrate - 4 Hours of Music for Studying, Concentration and Memory",
+     "channel": "Quiet Quest - Study Music",
+     "channel_url": "https://www.youtube.com/channel/UC1dVfl5-I98WX3yCy8IJQMg",
+     "url": "https://www.youtube.com/watch?v=sjkrrmBnpGE",
+     "live": false,
+     "duration": 14272,
+     "views": 63273105,
+     "viewers": 0
+    },
+    {
+     "id": "oPVte6aMprI",
+     "title": "Deep Focus - Music For Studying, Concentration and Work",
+     "channel": "Quiet Quest - Study Music",
+     "channel_url": "https://www.youtube.com/channel/UC1dVfl5-I98WX3yCy8IJQMg",
+     "url": "https://www.youtube.com/watch?v=oPVte6aMprI",
+     "live": false,
+     "duration": 13938,
+     "views": 32801390,
+     "viewers": 0
+    },
+    {
+     "id": "mJW57E7GpSo",
+     "title": "the best study playlist to keep you happy and motivated 💖 [ study, chill, relax, travel ]",
+     "channel": "Lily's Corner",
+     "channel_url": "https://www.youtube.com/channel/UC1gC6348uwz1UjMlIvj--CQ",
+     "url": "https://www.youtube.com/watch?v=mJW57E7GpSo",
+     "live": false,
+     "duration": 3781,
+     "views": 24465238,
+     "viewers": 0
+    },
+    {
+     "id": "lkkGlVWvkLk",
+     "title": "Intense Study - 40Hz Gamma Binaural Beats to Increase Productivity and Focus",
+     "channel": "Study Sonic Focus",
+     "channel_url": "https://www.youtube.com/channel/UCbkK0kd3xMIWIFyLl4f5I2A",
+     "url": "https://www.youtube.com/watch?v=lkkGlVWvkLk",
+     "live": false,
+     "duration": 7236,
+     "views": 22243801,
+     "viewers": 0
+    },
+    {
+     "id": "8O-1qB-fxjc",
+     "title": "Chill Songs Vol.02 | Cozy & Relaxing Music for a Peaceful Day",
+     "channel": "MocktailMusic",
+     "channel_url": "https://www.youtube.com/channel/UCGTAsn8acBVgrT7EEoW7mqQ",
+     "url": "https://www.youtube.com/watch?v=8O-1qB-fxjc",
+     "live": false,
+     "duration": 6115,
+     "views": 14773867,
+     "viewers": 0
+    },
+    {
+     "id": "jXZAbnn1kTU",
+     "title": "Ambient Study Music To Concentrate - 4 Hours of Music for Studying, Concentration and Memory",
+     "channel": "Quiet Quest - Study Music",
+     "channel_url": "https://www.youtube.com/channel/UC1dVfl5-I98WX3yCy8IJQMg",
+     "url": "https://www.youtube.com/watch?v=jXZAbnn1kTU",
+     "live": false,
+     "duration": 13882,
+     "views": 13518356,
+     "viewers": 0
+    },
+    {
+     "id": "ZVb_yKMivqo",
+     "title": "Productive Music For Work | Chill Playlist",
+     "channel": "BLUME",
+     "channel_url": "https://www.youtube.com/channel/UCq22aK0t0mrOEq676Be4ezw",
+     "url": "https://www.youtube.com/watch?v=ZVb_yKMivqo",
+     "live": false,
+     "duration": 4580,
+     "views": 9939494,
+     "viewers": 0
+    }
+   ]
+  },
+  {
+   "id": "study",
+   "name": "Study",
+   "entries": [
+    {
+     "id": "WPni755-Krg",
+     "title": "Study Music Alpha Waves: Relaxing Studying Music, Brain Power, Focus Concentration Music, ☯161",
+     "channel": "Yellow Brick Cinema - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UCwobzUc3z-0PrFpoRxNszXQ",
+     "url": "https://www.youtube.com/watch?v=WPni755-Krg",
+     "live": false,
+     "duration": 10798,
+     "views": 236502382,
+     "viewers": 0
+    },
+    {
+     "id": "lTRiuFIWV54",
+     "title": "1 A.M Study Session 📚 [lofi hip hop]",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=lTRiuFIWV54",
+     "live": false,
+     "duration": 3674,
+     "views": 135913287,
+     "viewers": 0
+    },
+    {
+     "id": "_4kHxtiuML0",
+     "title": "Focus Music for Work and Studying, Background Music for Concentration, Study Music",
+     "channel": "Greenred Productions - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UC1bjWVLp2aaJmPcNbi9OOsw",
+     "url": "https://www.youtube.com/watch?v=_4kHxtiuML0",
+     "live": false,
+     "duration": 32933,
+     "views": 83815023,
+     "viewers": 0
+    },
+    {
+     "id": "MYPVQccHhAQ",
+     "title": "4K Cozy Coffee Shop with Smooth Piano Jazz Music for Relaxing, Studying and Working",
+     "channel": "Relaxing Jazz Piano",
+     "channel_url": "https://www.youtube.com/channel/UC84t1K5ri-7u9bFCaUKTXDA",
+     "url": "https://www.youtube.com/watch?v=MYPVQccHhAQ",
+     "live": false,
+     "duration": 12923,
+     "views": 72213903,
+     "viewers": 0
+    },
+    {
+     "id": "sjkrrmBnpGE",
+     "title": "Ambient Study Music To Concentrate - 4 Hours of Music for Studying, Concentration and Memory",
+     "channel": "Quiet Quest - Study Music",
+     "channel_url": "https://www.youtube.com/channel/UC1dVfl5-I98WX3yCy8IJQMg",
+     "url": "https://www.youtube.com/watch?v=sjkrrmBnpGE",
+     "live": false,
+     "duration": 14272,
+     "views": 63273105,
+     "viewers": 0
+    },
+    {
+     "id": "mg7netw1JuM",
+     "title": "Super Intelligence: 🍎 Memory Music, Improve Memory and Concentration, Binaural Beats Focus Music",
+     "channel": "Greenred Productions - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UC1bjWVLp2aaJmPcNbi9OOsw",
+     "url": "https://www.youtube.com/watch?v=mg7netw1JuM",
+     "live": false,
+     "duration": 10281,
+     "views": 41741667,
+     "viewers": 0
+    },
+    {
+     "id": "oPVte6aMprI",
+     "title": "Deep Focus - Music For Studying, Concentration and Work",
+     "channel": "Quiet Quest - Study Music",
+     "channel_url": "https://www.youtube.com/channel/UC1dVfl5-I98WX3yCy8IJQMg",
+     "url": "https://www.youtube.com/watch?v=oPVte6aMprI",
+     "live": false,
+     "duration": 13938,
+     "views": 32801390,
+     "viewers": 0
+    },
+    {
+     "id": "BMuknRb7woc",
+     "title": "Classical Music for Studying & Brain Power | Mozart, Vivaldi, Tchaikovsky...",
+     "channel": "HALIDONMUSIC",
+     "channel_url": "https://www.youtube.com/channel/UCyOfqgtsQaM3S-VZnsYnHjQ",
+     "url": "https://www.youtube.com/watch?v=BMuknRb7woc",
+     "live": false,
+     "duration": 5756,
+     "views": 29166179,
+     "viewers": 0
+    },
+    {
+     "id": "lkkGlVWvkLk",
+     "title": "Intense Study - 40Hz Gamma Binaural Beats to Increase Productivity and Focus",
+     "channel": "Study Sonic Focus",
+     "channel_url": "https://www.youtube.com/channel/UCbkK0kd3xMIWIFyLl4f5I2A",
+     "url": "https://www.youtube.com/watch?v=lkkGlVWvkLk",
+     "live": false,
+     "duration": 7236,
+     "views": 22243801,
+     "viewers": 0
+    },
+    {
+     "id": "RG2IK8oRZNA",
+     "title": "ADHD Relief Music: Studying Music for Better Concentration and Focus, Study Music",
+     "channel": "Greenred Productions - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UC1bjWVLp2aaJmPcNbi9OOsw",
+     "url": "https://www.youtube.com/watch?v=RG2IK8oRZNA",
+     "live": false,
+     "duration": 28028,
+     "views": 19514375,
+     "viewers": 0
+    }
+   ]
+  },
+  {
+   "id": "focus",
+   "name": "Focus",
+   "entries": [
+    {
+     "id": "LpRjF6RQ_YY",
+     "title": "Focus Music • Zero-Distraction Hyperfocus for Deep Work, Study, and Peak Productivity",
+     "channel": "Relaxing Music Journey",
+     "channel_url": "https://www.youtube.com/channel/UCOQ6LTenFWnsiSFK7gwOCMQ",
+     "url": "https://www.youtube.com/watch?v=LpRjF6RQ_YY",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 283
+    },
+    {
+     "id": "hIH1joP9_FU",
+     "title": "Deep Focus - Music For Studying | Improve Your Focus - Study Music",
+     "channel": "Greenred Productions - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UC1bjWVLp2aaJmPcNbi9OOsw",
+     "url": "https://www.youtube.com/watch?v=hIH1joP9_FU",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 267
+    },
+    {
+     "id": "1Rc7k4RQ7hs",
+     "title": "Binaural Beats | Boost Focus and Concentration | Study Music",
+     "channel": "Greenred Productions - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UC1bjWVLp2aaJmPcNbi9OOsw",
+     "url": "https://www.youtube.com/watch?v=1Rc7k4RQ7hs",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 256
+    },
+    {
+     "id": "WPni755-Krg",
+     "title": "Study Music Alpha Waves: Relaxing Studying Music, Brain Power, Focus Concentration Music, ☯161",
+     "channel": "Yellow Brick Cinema - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UCwobzUc3z-0PrFpoRxNszXQ",
+     "url": "https://www.youtube.com/watch?v=WPni755-Krg",
+     "live": false,
+     "duration": 10798,
+     "views": 236502382,
+     "viewers": 0
+    },
+    {
+     "id": "_4kHxtiuML0",
+     "title": "Focus Music for Work and Studying, Background Music for Concentration, Study Music",
+     "channel": "Greenred Productions - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UC1bjWVLp2aaJmPcNbi9OOsw",
+     "url": "https://www.youtube.com/watch?v=_4kHxtiuML0",
+     "live": false,
+     "duration": 32933,
+     "views": 83815023,
+     "viewers": 0
+    },
+    {
+     "id": "mg7netw1JuM",
+     "title": "Super Intelligence: 🍎 Memory Music, Improve Memory and Concentration, Binaural Beats Focus Music",
+     "channel": "Greenred Productions - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UC1bjWVLp2aaJmPcNbi9OOsw",
+     "url": "https://www.youtube.com/watch?v=mg7netw1JuM",
+     "live": false,
+     "duration": 10281,
+     "views": 41741667,
+     "viewers": 0
+    },
+    {
+     "id": "oPVte6aMprI",
+     "title": "Deep Focus - Music For Studying, Concentration and Work",
+     "channel": "Quiet Quest - Study Music",
+     "channel_url": "https://www.youtube.com/channel/UC1dVfl5-I98WX3yCy8IJQMg",
+     "url": "https://www.youtube.com/watch?v=oPVte6aMprI",
+     "live": false,
+     "duration": 13938,
+     "views": 32801390,
+     "viewers": 0
+    },
+    {
+     "id": "acQS2Fef8tU",
+     "title": "Increase Brain Power, Focus Music, Reduce Anxiety, Binaural and Isochronic Beats",
+     "channel": "Music for Body and Spirit - Meditation Music",
+     "channel_url": "https://www.youtube.com/channel/UCfVJ_-zdASq6HR-ocI8yTww",
+     "url": "https://www.youtube.com/watch?v=acQS2Fef8tU",
+     "live": false,
+     "duration": 11816,
+     "views": 30875114,
+     "viewers": 0
+    },
+    {
+     "id": "lkkGlVWvkLk",
+     "title": "Intense Study - 40Hz Gamma Binaural Beats to Increase Productivity and Focus",
+     "channel": "Study Sonic Focus",
+     "channel_url": "https://www.youtube.com/channel/UCbkK0kd3xMIWIFyLl4f5I2A",
+     "url": "https://www.youtube.com/watch?v=lkkGlVWvkLk",
+     "live": false,
+     "duration": 7236,
+     "views": 22243801,
+     "viewers": 0
+    },
+    {
+     "id": "RG2IK8oRZNA",
+     "title": "ADHD Relief Music: Studying Music for Better Concentration and Focus, Study Music",
+     "channel": "Greenred Productions - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UC1bjWVLp2aaJmPcNbi9OOsw",
+     "url": "https://www.youtube.com/watch?v=RG2IK8oRZNA",
+     "live": false,
+     "duration": 28028,
+     "views": 19514375,
+     "viewers": 0
+    }
+   ]
+  },
+  {
+   "id": "zen",
+   "name": "Zen",
+   "entries": [
+    {
+     "id": "vFJuk4U-V7Q",
+     "title": "KUMAMICHI（熊道） — Japanese Zen Music Along the Bear’s Path",
+     "channel": "Aether Journey",
+     "channel_url": "https://www.youtube.com/@AetherJourneyMusic",
+     "url": "https://www.youtube.com/watch?v=vFJuk4U-V7Q",
+     "live": false,
+     "duration": 20817,
+     "views": 444916,
+     "viewers": 0,
+     "pinned": true
+    },
+    {
+     "id": "u11acmu6IC0",
+     "title": "Cleanse Toxic Energy & Emotional Stress | Zen Healing Oasis For Deep Relaxation & Inner Peace",
+     "channel": "Tranquil Zen Healing",
+     "channel_url": "https://www.youtube.com/channel/UC_OpxRWNE-q7dSuOl8e2zBg",
+     "url": "https://www.youtube.com/watch?v=u11acmu6IC0",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 2532
+    },
+    {
+     "id": "0h7Ttx9CJ4g",
+     "title": "Healing Music for Mind & Body 🌿 Japanese Garden with Soothing Water Sounds for Deep Sleep",
+     "channel": "Calming Here",
+     "channel_url": "https://www.youtube.com/channel/UCJEBp5Zrbzsyht6UNgqrefQ",
+     "url": "https://www.youtube.com/watch?v=0h7Ttx9CJ4g",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 2331
+    },
+    {
+     "id": "5_1OOKcawd8",
+     "title": "🔴 Relaxing Zen Music 24/7, Healing Music, Meditation Music, Spa Music, Sleep, Zen, Nature Sounds",
+     "channel": "Yellow Brick Cinema - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UCwobzUc3z-0PrFpoRxNszXQ",
+     "url": "https://www.youtube.com/watch?v=5_1OOKcawd8",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 303
+    },
+    {
+     "id": "Rwnta4vZHQE",
+     "title": "24/7 Japanese Zen Music – Peaceful Koto & Shakuhachi for Stress Relief and Mindfulness",
+     "channel": "禅の音 - Zen Sounds",
+     "channel_url": "https://www.youtube.com/channel/UCL4nsBA6qwh5M-WdmaohCxg",
+     "url": "https://www.youtube.com/watch?v=Rwnta4vZHQE",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 20
+    },
+    {
+     "id": "1ZYbU82GVz4",
+     "title": "Flying: Relaxing Sleep Music for Meditation, Stress Relief & Relaxation by Peder B. Helland",
+     "channel": "Soothing Relaxation",
+     "channel_url": "https://www.youtube.com/channel/UCjzHeG1KWoonmf9d5KBvSiw",
+     "url": "https://www.youtube.com/watch?v=1ZYbU82GVz4",
+     "live": false,
+     "duration": 10822,
+     "views": 531637958,
+     "viewers": 0
+    },
+    {
+     "id": "V1RPi2MYptM",
+     "title": "Relaxing Zen Music with Water Sounds • Peaceful Ambience for Spa, Yoga and Relaxation",
+     "channel": "Soothing Relaxation",
+     "channel_url": "https://www.youtube.com/channel/UCjzHeG1KWoonmf9d5KBvSiw",
+     "url": "https://www.youtube.com/watch?v=V1RPi2MYptM",
+     "live": false,
+     "duration": 11148,
+     "views": 88265461,
+     "viewers": 0
+    },
+    {
+     "id": "I3OJUwILelU",
+     "title": "Relaxing music Relieves stress, Anxiety and Depression 🌿 Heals the Mind, body and Soul - Deep Sleep",
+     "channel": "Relaxing Calming Music",
+     "channel_url": "https://www.youtube.com/channel/UCVSaNtZoJMlx8SxLxsNa1lw",
+     "url": "https://www.youtube.com/watch?v=I3OJUwILelU",
+     "live": false,
+     "duration": 5467,
+     "views": 80779202,
+     "viewers": 0
+    },
+    {
+     "id": "lh4JdZTJe7k",
+     "title": "12 Hours of Relaxing Sleep Music for Stress Relief, Sleeping & Meditation (Flying)",
+     "channel": "Soothing Relaxation",
+     "channel_url": "https://www.youtube.com/channel/UCjzHeG1KWoonmf9d5KBvSiw",
+     "url": "https://www.youtube.com/watch?v=lh4JdZTJe7k",
+     "live": false,
+     "duration": 43089,
+     "views": 74169579,
+     "viewers": 0
+    },
+    {
+     "id": "LFASWuckB1c",
+     "title": "(No Ads) Relaxing Music For Deep Sleep • Anxiety Relief, Melatonin Release • Stop Overthinking",
+     "channel": "Inner Healing Sleep",
+     "channel_url": "https://www.youtube.com/channel/UCXC4tEd0zMnQiWWGF5P9dzA",
+     "url": "https://www.youtube.com/watch?v=LFASWuckB1c",
+     "live": false,
+     "duration": 42897,
+     "views": 45811291,
+     "viewers": 0
+    }
+   ]
+  },
+  {
+   "id": "ambient",
+   "name": "Ambient & nature",
+   "entries": [
+    {
+     "id": "0h7Ttx9CJ4g",
+     "title": "Healing Music for Mind & Body 🌿 Japanese Garden with Soothing Water Sounds for Deep Sleep",
+     "channel": "Calming Here",
+     "channel_url": "https://www.youtube.com/channel/UCJEBp5Zrbzsyht6UNgqrefQ",
+     "url": "https://www.youtube.com/watch?v=0h7Ttx9CJ4g",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 2321
+    },
+    {
+     "id": "TGysUwc_LEc",
+     "title": "🎵 Private Interstellar Suite in Deep Space | Ambient Music and Deep Space Sounds | HD | LIVE",
+     "channel": "View Escape",
+     "channel_url": "https://www.youtube.com/channel/UCUc8mpd7aQROHAb-KxdoGww",
+     "url": "https://www.youtube.com/watch?v=TGysUwc_LEc",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 114
+    },
+    {
+     "id": "BLIKwfIJIyo",
+     "title": "🔴 Space Ambient Music ✨LIVE 24/7: Ambient Cosmic Background for Sleep, Studying, Meditation",
+     "channel": "Space Relax Music Channel",
+     "channel_url": "https://www.youtube.com/channel/UCSFB7Xy5Fa1pVVKP_CajIrw",
+     "url": "https://www.youtube.com/watch?v=BLIKwfIJIyo",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 35
+    },
+    {
+     "id": "RbFmlndWMqs",
+     "title": "🔴 Space Ambient Music LIVE 24/7: Space Traveling Background Music, Music for Stress Relief, Dreaming",
+     "channel": "Space Travel Ambient",
+     "channel_url": "https://www.youtube.com/channel/UCyaPQpWV7IBO9-nK75fcwQg",
+     "url": "https://www.youtube.com/watch?v=RbFmlndWMqs",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 3
+    },
+    {
+     "id": "_4kHxtiuML0",
+     "title": "Focus Music for Work and Studying, Background Music for Concentration, Study Music",
+     "channel": "Greenred Productions - Relaxing Music",
+     "channel_url": "https://www.youtube.com/channel/UC1bjWVLp2aaJmPcNbi9OOsw",
+     "url": "https://www.youtube.com/watch?v=_4kHxtiuML0",
+     "live": false,
+     "duration": 32933,
+     "views": 83815023,
+     "viewers": 0
+    },
+    {
+     "id": "lh4JdZTJe7k",
+     "title": "12 Hours of Relaxing Sleep Music for Stress Relief, Sleeping & Meditation (Flying)",
+     "channel": "Soothing Relaxation",
+     "channel_url": "https://www.youtube.com/channel/UCjzHeG1KWoonmf9d5KBvSiw",
+     "url": "https://www.youtube.com/watch?v=lh4JdZTJe7k",
+     "live": false,
+     "duration": 43089,
+     "views": 74169579,
+     "viewers": 0
+    },
+    {
+     "id": "lE6RYpe9IT0",
+     "title": "Relaxing Music with Nature Sounds - Waterfall HD",
+     "channel": "321 Relaxing - Meditation Relax Clips",
+     "channel_url": "https://www.youtube.com/channel/UCvGwWJ_bcMkHRBuTNCL08cA",
+     "url": "https://www.youtube.com/watch?v=lE6RYpe9IT0",
+     "live": false,
+     "duration": 16198,
+     "views": 67017388,
+     "viewers": 0
+    },
+    {
+     "id": "sjkrrmBnpGE",
+     "title": "Ambient Study Music To Concentrate - 4 Hours of Music for Studying, Concentration and Memory",
+     "channel": "Quiet Quest - Study Music",
+     "channel_url": "https://www.youtube.com/channel/UC1dVfl5-I98WX3yCy8IJQMg",
+     "url": "https://www.youtube.com/watch?v=sjkrrmBnpGE",
+     "live": false,
+     "duration": 14272,
+     "views": 63273105,
+     "viewers": 0
+    },
+    {
+     "id": "cq2Ef6rvL6g",
+     "title": "AMBIENT CHILLOUT LOUNGE RELAXING MUSIC - Essential Relax Session 1 - Background Chill Out Music -",
+     "channel": "Relax Chillout Music",
+     "channel_url": "https://www.youtube.com/channel/UCUjD5RFkzbwfivClshUqqpg",
+     "url": "https://www.youtube.com/watch?v=cq2Ef6rvL6g",
+     "live": false,
+     "duration": 10994,
+     "views": 56283221,
+     "viewers": 0
+    },
+    {
+     "id": "eKFTSSKCzWA",
+     "title": "Relaxing Nature Sounds for Sleeping - Natural Calm Forest Waterfall Music Meditation Sound for Study",
+     "channel": "johnnielawson",
+     "channel_url": "https://www.youtube.com/channel/UC4UWbQ23IbWwU-XG7XIWxvQ",
+     "url": "https://www.youtube.com/watch?v=eKFTSSKCzWA",
+     "live": false,
+     "duration": 30004,
+     "views": 55048148,
+     "viewers": 0
+    }
+   ]
+  },
+  {
+   "id": "jazz",
+   "name": "Jazz",
+   "entries": [
+    {
+     "id": "C50D8UBWo-I",
+     "title": "Happy September Morning Jazz 🍂Autumn Coffee Shop Ambience with Jazz Relaxing Music for Stress Relief",
+     "channel": "Sweet Jazz Cafe",
+     "channel_url": "https://www.youtube.com/channel/UCzMGBnrq1LwN_MGl1DU9TWQ",
+     "url": "https://www.youtube.com/watch?v=C50D8UBWo-I",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 5207
+    },
+    {
+     "id": "D_rAHBWidjI",
+     "title": "Vintage Evening Radio Jazz  – 1930s 1940s Smooth Swing & Vinyl Background Music",
+     "channel": "Dark Sea Ambience",
+     "channel_url": "https://www.youtube.com/channel/UCdzTYa7hm1x-WyOnBaHH9Lw",
+     "url": "https://www.youtube.com/watch?v=D_rAHBWidjI",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 3508
+    },
+    {
+     "id": "UZiKR5HHXTo",
+     "title": "Refreshing Spring Jazz Music To Stress Relief - Soft Jazz At Lakeside Cafe Ambience For Unwind",
+     "channel": "Quiet Indoor Ambience",
+     "channel_url": "https://www.youtube.com/channel/UCfdnMy50axRErrs--X7oF1A",
+     "url": "https://www.youtube.com/watch?v=UZiKR5HHXTo",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 2075
+    },
+    {
+     "id": "quaTyjGpDtE",
+     "title": "Happy September Morning Jazz ~ Summer Lakeside Porch Ambience☀️Jazz Relaxing Music for Stress Relief",
+     "channel": "Sweet Jazz Cafe",
+     "channel_url": "https://www.youtube.com/channel/UCzMGBnrq1LwN_MGl1DU9TWQ",
+     "url": "https://www.youtube.com/watch?v=quaTyjGpDtE",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 1390
+    },
+    {
+     "id": "Dx5qFachd3A",
+     "title": "Relaxing Jazz Piano Radio - Slow Jazz Music - 24/7 Live Stream - Music For Work & Study",
+     "channel": "Cafe Music BGM channel",
+     "channel_url": "https://www.youtube.com/channel/UCJhjE7wbdYAae1G25m0tHAA",
+     "url": "https://www.youtube.com/watch?v=Dx5qFachd3A",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 1038
+    },
+    {
+     "id": "neV3EPgvZ3g",
+     "title": "Relaxing Jazz Music - Background Chill Out  Music - Music For Relax,Study,Work",
+     "channel": "Cafe Music BGM channel",
+     "channel_url": "https://www.youtube.com/channel/UCJhjE7wbdYAae1G25m0tHAA",
+     "url": "https://www.youtube.com/watch?v=neV3EPgvZ3g",
+     "live": false,
+     "duration": 12789,
+     "views": 120850147,
+     "viewers": 0
+    },
+    {
+     "id": "MYPVQccHhAQ",
+     "title": "4K Cozy Coffee Shop with Smooth Piano Jazz Music for Relaxing, Studying and Working",
+     "channel": "Relaxing Jazz Piano",
+     "channel_url": "https://www.youtube.com/channel/UC84t1K5ri-7u9bFCaUKTXDA",
+     "url": "https://www.youtube.com/watch?v=MYPVQccHhAQ",
+     "live": false,
+     "duration": 12923,
+     "views": 72214024,
+     "viewers": 0
+    },
+    {
+     "id": "NJuSStkIZBg",
+     "title": "Rainy Jazz Cafe - Slow Jazz Music in Coffee Shop Ambience for Work, Study and Relaxation",
+     "channel": "Coffee Shop Vibes",
+     "channel_url": "https://www.youtube.com/channel/UCJIOFQLGwB3GH9K9waxwynQ",
+     "url": "https://www.youtube.com/watch?v=NJuSStkIZBg",
+     "live": false,
+     "duration": 12840,
+     "views": 49267221,
+     "viewers": 0
+    },
+    {
+     "id": "Hp_Eg8NMfT0",
+     "title": "Positive Mood JAZZ - Sunny Jazz Cafe and Bossa Nova Music",
+     "channel": "Relax Cafe Music",
+     "channel_url": "https://www.youtube.com/channel/UCaCE5pzy49M8nQ59plgmFOA",
+     "url": "https://www.youtube.com/watch?v=Hp_Eg8NMfT0",
+     "live": false,
+     "duration": 36000,
+     "views": 23175488,
+     "viewers": 0
+    },
+    {
+     "id": "c0_ejQQcrwI",
+     "title": "Rainy Night Coffee Shop Ambience with Relaxing Jazz Music and Rain Sounds - 8 Hours",
+     "channel": "Calmed By Nature",
+     "channel_url": "https://www.youtube.com/channel/UCJuMbdKSMThk2RpALASyXVQ",
+     "url": "https://www.youtube.com/watch?v=c0_ejQQcrwI",
+     "live": false,
+     "duration": 28981,
+     "views": 18063581,
+     "viewers": 0
+    }
+   ]
+  },
+  {
+   "id": "sleep",
+   "name": "Sleep",
+   "entries": [
+    {
+     "id": "Dfm2rB-nQ9Y",
+     "title": "No Ads Rain Sounds for Sleeping - ASMR Rain and Thunder Sounds For Sleeping, Relaxing",
+     "channel": "Sleep Soundly - HDR",
+     "channel_url": "https://www.youtube.com/channel/UCJ00lvZsTVvgOZJrlPXMBRQ",
+     "url": "https://www.youtube.com/watch?v=Dfm2rB-nQ9Y",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 4227
+    },
+    {
+     "id": "8rTTEMdMh8Q",
+     "title": "🔴 Heavy Rain and Thunder Sounds for Sleeping - Black Screen | Perfect Thunderstorm for Rest, Live",
+     "channel": "Relaxing Music Collection",
+     "channel_url": "https://www.youtube.com/channel/UC2wPj_TG9CZ1_DZS69oyKnA",
+     "url": "https://www.youtube.com/watch?v=8rTTEMdMh8Q",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 3658
+    },
+    {
+     "id": "42M3esYyHdw",
+     "title": "🔴 Gentle Night Rain — Sleep Fast TONIGHT + Black Screen (NO AI)",
+     "channel": "The Relaxed Guy",
+     "channel_url": "https://www.youtube.com/channel/UCGfgKimGJ4yueKEtFVPpHtw",
+     "url": "https://www.youtube.com/watch?v=42M3esYyHdw",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 705
+    },
+    {
+     "id": "c6IMQjwKn7o",
+     "title": "Rain Sounds For Sleeping - 99% Instantly Fall Asleep With Rain And Thunder Sound At Night, Regen 411",
+     "channel": "Rain Sound Natural",
+     "channel_url": "https://www.youtube.com/channel/UCU262Yzz-G0ns8SxDH0j5EA",
+     "url": "https://www.youtube.com/watch?v=c6IMQjwKn7o",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 365
+    },
+    {
+     "id": "1lTPGnBvPUk",
+     "title": "Fall Asleep Instantly with Heavy Rain Sounds in a Car & Powerful Night Thunder in the Rainforest🌧️",
+     "channel": "Doctor Sleep ",
+     "channel_url": "https://www.youtube.com/channel/UC8FmeAPIsAom5x4dcVk4htg",
+     "url": "https://www.youtube.com/watch?v=1lTPGnBvPUk",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 234
+    },
+    {
+     "id": "1ZYbU82GVz4",
+     "title": "Flying: Relaxing Sleep Music for Meditation, Stress Relief & Relaxation by Peder B. Helland",
+     "channel": "Soothing Relaxation",
+     "channel_url": "https://www.youtube.com/channel/UCjzHeG1KWoonmf9d5KBvSiw",
+     "url": "https://www.youtube.com/watch?v=1ZYbU82GVz4",
+     "live": false,
+     "duration": 10822,
+     "views": 531637958,
+     "viewers": 0
+    },
+    {
+     "id": "q76bMs-NwRk",
+     "title": "3 Hours of Gentle Night Rain, Rain Sounds for Sleeping - Dark Screen to Beat insomnia, Relax, Study",
+     "channel": "The Relaxed Guy",
+     "channel_url": "https://www.youtube.com/channel/UCGfgKimGJ4yueKEtFVPpHtw",
+     "url": "https://www.youtube.com/watch?v=q76bMs-NwRk",
+     "live": false,
+     "duration": 10896,
+     "views": 247256687,
+     "viewers": 0
+    },
+    {
+     "id": "yMRoNNKWuqQ",
+     "title": "THUNDER and RAIN Sounds for Sleeping BLACK SCREEN | Sleep and Relaxation | Dark Screen Nature Sounds",
+     "channel": "Sleep & Relaxation",
+     "channel_url": "https://www.youtube.com/channel/UCNdGwhwU7EU51MuBhQFRL1g",
+     "url": "https://www.youtube.com/watch?v=yMRoNNKWuqQ",
+     "live": false,
+     "duration": 36121,
+     "views": 217079132,
+     "viewers": 0
+    },
+    {
+     "id": "Lp6XlsBm_Lw",
+     "title": "You & Me: Relaxing Piano Music & Soft Rain Sounds For Sleep & Relaxation by Peder B. Helland",
+     "channel": "Soothing Relaxation",
+     "channel_url": "https://www.youtube.com/channel/UCjzHeG1KWoonmf9d5KBvSiw",
+     "url": "https://www.youtube.com/watch?v=Lp6XlsBm_Lw",
+     "live": false,
+     "duration": 10906,
+     "views": 181882888,
+     "viewers": 0
+    },
+    {
+     "id": "o8GrqUSdzi0",
+     "title": "Relaxing Music & Rain Sounds - Beautiful Piano Music, Background Music, Sleep Music • You & Me",
+     "channel": "Soothing Relaxation",
+     "channel_url": "https://www.youtube.com/channel/UCjzHeG1KWoonmf9d5KBvSiw",
+     "url": "https://www.youtube.com/watch?v=o8GrqUSdzi0",
+     "live": false,
+     "duration": 36195,
+     "views": 173861937,
+     "viewers": 0
+    }
+   ]
+  },
+  {
+   "id": "classical",
+   "name": "Classical",
+   "entries": [
+    {
+     "id": "5Ua5hWAe6Wo",
+     "title": "Quiet Autumn Above the Old Town | Melancholy Piano & Violin | Dark Academia Rainy Evening Playlist",
+     "channel": "aurora IV",
+     "channel_url": "https://www.youtube.com/channel/UCutu0Blo2G3hjg2vE4TvDSw",
+     "url": "https://www.youtube.com/watch?v=5Ua5hWAe6Wo",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 2078
+    },
+    {
+     "id": "y6TZHLAzg5o",
+     "title": "Classical Piano Music & Fireplace 24/7 - Mozart, Chopin, Beethoven, Bach, Grieg, Schumann, Satie",
+     "channel": "Odd Eagle",
+     "channel_url": "https://www.youtube.com/channel/UCFd5q5UWWV0RpSpPkTFOtRg",
+     "url": "https://www.youtube.com/watch?v=y6TZHLAzg5o",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 420
+    },
+    {
+     "id": "mtIs1fPaTRE",
+     "title": "Classical Piano (No Mid-Roll Ads) | 24/7 Classical Music",
+     "channel": "Classical Oasis",
+     "channel_url": "https://www.youtube.com/channel/UCzo-s-TNyLPq41bW7VUDQ0w",
+     "url": "https://www.youtube.com/watch?v=mtIs1fPaTRE",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 34
+    },
+    {
+     "id": "mIYzp5rcTvU",
+     "title": "Classical Music for Reading - Mozart, Chopin, Debussy, Tchaikovsky...",
+     "channel": "HALIDONMUSIC",
+     "channel_url": "https://www.youtube.com/channel/UCyOfqgtsQaM3S-VZnsYnHjQ",
+     "url": "https://www.youtube.com/watch?v=mIYzp5rcTvU",
+     "live": false,
+     "duration": 8873,
+     "views": 84592453,
+     "viewers": 0
+    },
+    {
+     "id": "MYPVQccHhAQ",
+     "title": "4K Cozy Coffee Shop with Smooth Piano Jazz Music for Relaxing, Studying and Working",
+     "channel": "Relaxing Jazz Piano",
+     "channel_url": "https://www.youtube.com/channel/UC84t1K5ri-7u9bFCaUKTXDA",
+     "url": "https://www.youtube.com/watch?v=MYPVQccHhAQ",
+     "live": false,
+     "duration": 12923,
+     "views": 72214024,
+     "viewers": 0
+    },
+    {
+     "id": "cGYyOY4XaFs",
+     "title": "The Best of Piano: The most beautiful classical piano pieces for relax & study",
+     "channel": "Rousseau",
+     "channel_url": "https://www.youtube.com/channel/UCPZUQqtVDmcjm4NY5FkzqLA",
+     "url": "https://www.youtube.com/watch?v=cGYyOY4XaFs",
+     "live": false,
+     "duration": 9130,
+     "views": 32498227,
+     "viewers": 0
+    },
+    {
+     "id": "IYd1-cPwQCk",
+     "title": "50 Classical Music Masterpieces for Relaxation & the Soul | Beethoven, Mozart, Chopin, Bach, Vivaldi",
+     "channel": "Classical Stars",
+     "channel_url": "https://www.youtube.com/channel/UCkCCOxutX-JxBvfWDrd0dOw",
+     "url": "https://www.youtube.com/watch?v=IYd1-cPwQCk",
+     "live": false,
+     "duration": 12328,
+     "views": 29772311,
+     "viewers": 0
+    },
+    {
+     "id": "BMuknRb7woc",
+     "title": "Classical Music for Studying & Brain Power | Mozart, Vivaldi, Tchaikovsky...",
+     "channel": "HALIDONMUSIC",
+     "channel_url": "https://www.youtube.com/channel/UCyOfqgtsQaM3S-VZnsYnHjQ",
+     "url": "https://www.youtube.com/watch?v=BMuknRb7woc",
+     "live": false,
+     "duration": 5756,
+     "views": 29166179,
+     "viewers": 0
+    },
+    {
+     "id": "0UN_HbOTTcI",
+     "title": "Classical Music for Brain Power | Mozart, Beethoven, Vivaldi...",
+     "channel": "HALIDONMUSIC",
+     "channel_url": "https://www.youtube.com/channel/UCyOfqgtsQaM3S-VZnsYnHjQ",
+     "url": "https://www.youtube.com/watch?v=0UN_HbOTTcI",
+     "live": false,
+     "duration": 11753,
+     "views": 19206928,
+     "viewers": 0
+    },
+    {
+     "id": "sAcj8me7wGI",
+     "title": "Relaxing Piano Music For Study and Focus",
+     "channel": "Ocb Relax",
+     "channel_url": "https://www.youtube.com/channel/UCb1ANUIW7arUUDI-Mwz65rw",
+     "url": "https://www.youtube.com/watch?v=sAcj8me7wGI",
+     "live": false,
+     "duration": 10899,
+     "views": 16037793,
+     "viewers": 0
+    }
+   ]
+  },
+  {
+   "id": "synthwave",
+   "name": "Synthwave",
+   "entries": [
+    {
+     "id": "4xDzrJKXOOY",
+     "title": "synthwave radio 🌌 beats to chill/game to",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=4xDzrJKXOOY",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 3041
+    },
+    {
+     "id": "UedTcufyrHc",
+     "title": "ChillSynth FM - lofi synthwave radio for retro dreaming",
+     "channel": "Nightride FM",
+     "channel_url": "https://www.youtube.com/channel/UCJ80_CMnIOrKtMyFbIFIQ7A",
+     "url": "https://www.youtube.com/watch?v=UedTcufyrHc",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 524
+    },
+    {
+     "id": "RrkrdYm3HPQ",
+     "title": "Blade Runner Radio",
+     "channel": "( LUX )  - Ambient Music",
+     "channel_url": "https://www.youtube.com/channel/UCGjd2P9By_xh0-UrGW3SaZw",
+     "url": "https://www.youtube.com/watch?v=RrkrdYm3HPQ",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 293
+    },
+    {
+     "id": "S_MOd40zlYU",
+     "title": "dark ambient radio 🌃 music to escape/dream to",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=S_MOd40zlYU",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 235
+    },
+    {
+     "id": "UYOb37KRFqk",
+     "title": "Art of Minimal Techno 'Deep' Radio | Melodic Techno & Progressive House 24/7 Live by Trippy Code",
+     "channel": "Art of Electronic Trip",
+     "channel_url": "https://www.youtube.com/channel/UCDf6reK_hHcz0d7KWBhmPhA",
+     "url": "https://www.youtube.com/watch?v=UYOb37KRFqk",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 231
+    },
+    {
+     "id": "0QKQlf8r7ls",
+     "title": "'Back To The 80's' | Marvel83' Edition | Best of Synthwave And Retro Electro Music Mix",
+     "channel": "ThePrimeThanatos",
+     "channel_url": "https://www.youtube.com/channel/UCmYTgpKxd-QOJCPDrmaXuqQ",
+     "url": "https://www.youtube.com/watch?v=0QKQlf8r7ls",
+     "live": false,
+     "duration": 3778,
+     "views": 15995680,
+     "viewers": 0
+    },
+    {
+     "id": "yhCuCqJbOVE",
+     "title": "ＣＹＢＥＲ　ＤＲＥＡＭ [Chillwave - Synthwave Mix]",
+     "channel": "Smooth S o u n d s",
+     "channel_url": "https://www.youtube.com/channel/UC-7RDShJHg-QfxLkcNXG-nQ",
+     "url": "https://www.youtube.com/watch?v=yhCuCqJbOVE",
+     "live": false,
+     "duration": 7212,
+     "views": 6274367,
+     "viewers": 0
+    },
+    {
+     "id": "MxGJCjNa-80",
+     "title": "| L O S T    N I G H T S  | - A NewRetroWave Mix | 1 Hour | Synthwave/ Retrowave/ Dreamwave |",
+     "channel": "NewRetroWave",
+     "channel_url": "https://www.youtube.com/channel/UCD-4g5w1h8xQpLaNS_ghU4g",
+     "url": "https://www.youtube.com/watch?v=MxGJCjNa-80",
+     "live": false,
+     "duration": 4340,
+     "views": 4747061,
+     "viewers": 0
+    },
+    {
+     "id": "TlWYgGyNnJo",
+     "title": "1 A.M Chill Session 🌌 [synthwave]",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=TlWYgGyNnJo",
+     "live": false,
+     "duration": 8952,
+     "views": 4491014,
+     "viewers": 0
+    },
+    {
+     "id": "6aouLxiL4Cw",
+     "title": "B A D L A N D S - A Synthwave Mix for Galactic Explorers | Vol. 1",
+     "channel": "INEXED",
+     "channel_url": "https://www.youtube.com/channel/UCC--Uf_xQNlCcbJEWF6Ijjg",
+     "url": "https://www.youtube.com/watch?v=6aouLxiL4Cw",
+     "live": false,
+     "duration": 8454,
+     "views": 1999682,
+     "viewers": 0
+    }
+   ]
+  },
+  {
+   "id": "streams",
+   "name": "24/7 streams",
+   "entries": [
+    {
+     "id": "rFZHOHl-L8A",
+     "title": "lofi hip hop radio 📚 beats to relax/study to",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=rFZHOHl-L8A",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 21206
+    },
+    {
+     "id": "D_rAHBWidjI",
+     "title": "Vintage Evening Radio Jazz  – 1930s 1940s Smooth Swing & Vinyl Background Music",
+     "channel": "Dark Sea Ambience",
+     "channel_url": "https://www.youtube.com/channel/UCdzTYa7hm1x-WyOnBaHH9Lw",
+     "url": "https://www.youtube.com/watch?v=D_rAHBWidjI",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 3508
+    },
+    {
+     "id": "4xDzrJKXOOY",
+     "title": "synthwave radio 🌌 beats to chill/game to",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=4xDzrJKXOOY",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 3041
+    },
+    {
+     "id": "V-mss50iInU",
+     "title": "Relax Bossa LIVE 24/7 - Bossa Nova Covers of Popular Songs 50 Hits 2026 Soft Lounge For Relax 🎧",
+     "channel": "Enya Bossa",
+     "channel_url": "https://www.youtube.com/channel/UCIp-7bo1iM_kgBvX6DzNzWg",
+     "url": "https://www.youtube.com/watch?v=V-mss50iInU",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 2596
+    },
+    {
+     "id": "E2vONfzoyRI",
+     "title": "jazz lofi radio 🎷 beats to chill/study to",
+     "channel": "Lofi Girl",
+     "channel_url": "https://www.youtube.com/channel/UCSJ4gkVC6NrvII8umztf0Ow",
+     "url": "https://www.youtube.com/watch?v=E2vONfzoyRI",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 2239
+    },
+    {
+     "id": "AZRWixZJr-Y",
+     "title": "Vintage Evening Radio Jazz – 1930s 1940s Smooth Swing & Vinyl Background Music",
+     "channel": "The Vintage Dreamers",
+     "channel_url": "https://www.youtube.com/channel/UCZg1SfqfGy0PRNlzjWvUuKw",
+     "url": "https://www.youtube.com/watch?v=AZRWixZJr-Y",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 2227
+    },
+    {
+     "id": "36YnV9STBqc",
+     "title": "The Good Life Radio • 24/7 Live Radio | Best Relax House, Chillout, Study, Running, Gym, Happy Music",
+     "channel": "The Good Life Radio x Sensual Musique",
+     "channel_url": "https://www.youtube.com/channel/UChs0pSaEoNLV4mevBFGaoKA",
+     "url": "https://www.youtube.com/watch?v=36YnV9STBqc",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 1489
+    },
+    {
+     "id": "b-bK2Vn3D38",
+     "title": "Best Radio 1 POP Hits [ 24/7 Live ] Best of POP 2026 Songs | 2026 Pop Playlist | Hits Music",
+     "channel": "Radio Mix",
+     "channel_url": "https://www.youtube.com/channel/UCCTVoz8uUBKn4TUKntJacng",
+     "url": "https://www.youtube.com/watch?v=b-bK2Vn3D38",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 1153
+    },
+    {
+     "id": "Dx5qFachd3A",
+     "title": "Relaxing Jazz Piano Radio - Slow Jazz Music - 24/7 Live Stream - Music For Work & Study",
+     "channel": "Cafe Music BGM channel",
+     "channel_url": "https://www.youtube.com/channel/UCJhjE7wbdYAae1G25m0tHAA",
+     "url": "https://www.youtube.com/watch?v=Dx5qFachd3A",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 1038
+    },
+    {
+     "id": "5yx6BWlEVcY",
+     "title": "Chillhop Radio - jazzy & lofi hip hop beats 🐾",
+     "channel": "Chillhop Music",
+     "channel_url": "https://www.youtube.com/channel/UCOxqgCwgOqC2lMqC5PYz_Dg",
+     "url": "https://www.youtube.com/watch?v=5yx6BWlEVcY",
+     "live": true,
+     "duration": 0,
+     "views": 0,
+     "viewers": 976
+    }
+   ]
+  }
+ ],
+ "source": "tools/build-catalog.sh (yt-dlp searches); zen pins the default stream first"
+}

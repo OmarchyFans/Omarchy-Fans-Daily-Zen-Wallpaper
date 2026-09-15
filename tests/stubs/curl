@@ -1,0 +1,21 @@
+#!/bin/bash
+# test stub: file:// goes to the real curl (the update check fixtures); the
+# catalog and the ratings API answer from fixtures. Records argv in $DZ_LOG.
+url=""; method=GET; data=""
+args=("$@")
+for ((i = 0; i < $#; i++)); do
+  a=${args[i]}
+  case "$a" in -X) method=${args[i+1]} ;; --data) data=${args[i+1]} ;; http://*|https://*|file://*) url=$a ;; esac
+done
+[[ $url == file://* || $url == http://127.0.0.1* ]] && exec /usr/bin/curl "$@"
+echo "curl $method $url" >>"${DZ_LOG:-/dev/null}"
+[[ -n ${DZ_OFFLINE:-} ]] && exit 7
+case "$url" in
+  */catalog.json) cat "${DZ_CATALOG_FIXTURE:?}" ;;
+  */v1/ratings) cat "${DZ_RATINGS_FIXTURE:?}" ;;
+  */v1/rate)
+    [[ $data == @- ]] && data=$(cat)
+    echo "rate-body $method $data" >>"${DZ_LOG:-/dev/null}"
+    jq -c '{video_id, avg: 4.5, count: 3}' <<<"$data" ;;
+  *) exit 22 ;;
+esac

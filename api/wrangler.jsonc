@@ -1,0 +1,13 @@
+// Daily Zen Wallpaper ratings API. Deployed by .github/workflows/deploy-api.yml,
+// which creates the D1 database on first run and fills DATABASE_ID below.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "omarchy-fans-zen-ratings",
+  "main": "worker.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "observability": { "enabled": true },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "omarchy-fans-zen-ratings", "database_id": "DATABASE_ID" }
+  ]
+}

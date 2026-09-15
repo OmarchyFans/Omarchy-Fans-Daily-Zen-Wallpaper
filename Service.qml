@@ -112,6 +112,10 @@ Item {
       }
       // A new source: the windows reload from the binding on stream.video_url,
       // the audio player from syncPlayers. Pending seeks apply on load.
+      // At startup (a shell restart, a reboot) the helper hands back where the
+      // same video was last saved, so the stream carries on from there.
+      if ((root.resolveReason === "start" || root.resolveReason === "retry") && Number(s.resume_position || 0) > 5 && !s.is_live)
+        root.resumeAt = Number(s.resume_position) * 1000
       root.stream = s
       resumeClear.restart()
       syncSoon.restart()
@@ -254,6 +258,18 @@ Item {
   Timer { interval: 10000; repeat: true; running: root.state === "playing"; onTriggered: {
     var lead = root.mode === "animated" ? root.leadVideo() : audio
     if (lead && lead.position > 0) root.savedPosition = lead.position
+  } }
+  // Remember where the stream is, so a shell restart or a reboot resumes there.
+  Process {
+    id: positionProc
+    environment: root.cliEnv
+    stdout: StdioCollector { waitForEnd: true }
+    stderr: StdioCollector { waitForEnd: true }
+  }
+  Timer { interval: 30000; repeat: true; running: root.state === "playing" && root.stream !== null && !root.stream.is_live; onTriggered: {
+    if (positionProc.running || root.savedPosition <= 0 || !root.stream) return
+    positionProc.command = ["/usr/bin/bash", root.cli, "position", "save", String(root.stream.video_id), String(Math.floor(root.savedPosition / 1000))]
+    positionProc.running = true
   } }
 
   // ---- fullscreen -------------------------------------------------------------

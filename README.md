@@ -29,6 +29,19 @@ upload, checked every day).
 - **Stays out of the way.** Video decoding pauses while a fullscreen window
   covers the wallpaper (the music keeps playing); the video is capped at 720p
   by default (480p and 1080p are a click away).
+- **Library.** The ten most popular long streams in each category: lofi, work,
+  study, focus, zen, ambient and nature, jazz, sleep, classical, synthwave and
+  24/7 streams. Built from YouTube searches by `tools/build-catalog.sh` and
+  refreshed from this repository's main branch once a day, so the list stays
+  current without a plugin update. Aether Journey's bear path stays first in Zen.
+- **Creators.** Follow YouTube channels (Aether Journey is in from the start):
+  the selector lists a creator's latest streams and uploads, and *Play this
+  creator* makes their newest upload the wallpaper, rechecked every day.
+- **Bookmarks and ratings.** Flag any entry, give it one to five stars. Stars
+  are shared with every install through a small ratings API, so each row shows
+  everyone's average. `share_ratings: false` keeps yours on this machine.
+- **Picks up where it left off.** The engine saves the playback position every
+  30 seconds; after a shell restart or a reboot the same video resumes there.
 - **Update alerts.** The popup tells you when a newer version is published and
   what changed.
 
@@ -99,6 +112,14 @@ omarchy-daily-zen theme [--frame PATH] [--light] [--no-apply]   Aether palette -
 omarchy-daily-zen daily [--force]          the daily refresh
 omarchy-daily-zen daily-refresh on|off | daily-theme on|off | fullscreen-pause on|off
 omarchy-daily-zen open                     the current video in the browser
+omarchy-daily-zen library [--json] [--category ID | --channel ID | --bookmarks] [--refresh]
+omarchy-daily-zen play ID|URL|CREATOR      play a library entry, any YouTube video, or a creator's newest
+omarchy-daily-zen bookmark [list|add [ID]|remove ID|toggle [ID]]
+omarchy-daily-zen rate ID 1..5             0 removes; shared unless share-ratings off
+omarchy-daily-zen ratings [--refresh]      everyone's averages
+omarchy-daily-zen channel [list|add URL|remove ID|videos ID]
+omarchy-daily-zen catalog [--refresh]      the curated list
+omarchy-daily-zen position                 where the stream is (saved every 30 s)
 ```
 
 Settings live in `~/.config/omarchy-daily-zen/config.json` (the helper writes
@@ -111,9 +132,19 @@ other file from its own templates.
 
 ## What leaves your machine
 
-- yt-dlp asks YouTube for the stream (the video page and its formats), and the
-  engine streams video and audio from YouTube's servers while it plays.
+- yt-dlp asks YouTube for the stream (the video page and its formats), for a
+  creator's latest videos, and for the title of a bookmarked video it does not
+  know; the engine streams video and audio from YouTube's servers while it plays.
 - ffmpeg fetches one frame for a still.
+- Once a day the catalog (`catalog.json`) is fetched from this repository's
+  main branch on GitHub.
+- A rating sends three things to the ratings API named in the catalog: a
+  random install id made on first use (no account, no name), the video id and
+  the stars. Averages are fetched once an hour. `omarchy-daily-zen share-ratings
+  off` keeps ratings local. The API (`api/`) stores only those rows and counts
+  requests per IP for a minute to cap writes.
+- The Suno link at the top of the popup opens the author's invite page in your
+  browser only when you click it.
 - Once every six hours the update check fetches this plugin's `manifest.json`
   (and `CHANGELOG.md` when there is something new) from GitHub. It sends no
   personal data; `"update_check": false` in the config file turns it off.
@@ -129,6 +160,16 @@ bullets, and *Update…* opens a terminal where `omarchy plugin update` shows th
 diff and asks, `install.sh` asks, and a shell restart loads the new engine. By
 hand: `omarchy plugin update fans.omarchy.daily-zen-wallpaper`, then
 `omarchy restart shell`. Details in [docs/update-alerts.md](docs/update-alerts.md).
+
+## Ratings API
+
+`api/worker.js` is a Cloudflare Worker over D1 (`api/schema.sql`). Deployed by
+`.github/workflows/deploy-api.yml` once the repository has the secrets
+`CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`; the workflow creates the
+database on first run. The worker URL goes into `catalog.json` as
+`ratings_api`, which every install picks up within a day. Until then the
+library says community ratings are not available and stars stay local (they
+are sent later, on the next `ratings --refresh` or daily refresh).
 
 ## Good to know
 
@@ -162,7 +203,9 @@ Widget.qml           the bar chip and popup
 bin/omarchy-daily-zen   resolve / still / theme / daily / settings (bash + jq)
 lib/update.sh        update alerts (shared across Omarchy.Fans plugins)
 install.sh uninstall.sh
-tests/run.sh         offline tests; tests/stubs, tests/fixtures
+catalog.json         the curated library (tools/build-catalog.sh rebuilds it)
+api/                 the ratings Worker (Cloudflare, D1) and its deploy workflow
+tests/run.sh         offline tests; tests/stubs, tests/fixtures; `tests/run.sh api` against wrangler dev
 docs/update-alerts.md
 ```
 
