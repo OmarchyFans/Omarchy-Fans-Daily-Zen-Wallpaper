@@ -5,8 +5,11 @@ install of Zen Wallpaper and hands the averages back. `worker.js` is the
 whole service; `schema.sql` the two tables.
 
 Deploy: `.github/workflows/deploy-api.yml` runs on every push that touches
-`api/`, once the repository has the secrets `CLOUDFLARE_API_TOKEN` (Workers
-Scripts + D1 edit) and `CLOUDFLARE_ACCOUNT_ID`. It creates the D1 database on
+`api/`, once the repository has the secrets `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID`. Token: dash.cloudflare.com/profile/api-tokens → Create
+Token → Custom token with exactly two permissions, Account · Workers Scripts ·
+Edit and Account · D1 · Edit, scoped to the one account. Account ID: Workers &
+Pages → Overview, right-hand column. It creates the D1 database on
 first run, applies `schema.sql`, fills the database id into `wrangler.jsonc`
 for the deploy, and prints the worker URL. Put that URL into `catalog.json` as
 `ratings_api` and every install starts sharing ratings within a day.
